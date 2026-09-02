@@ -33,6 +33,27 @@ export function formatTimeRemaining(ms: number): string {
   return `${seconds}s left`;
 }
 
+/** Short duration for card headlines: "18 min" or "1h 12m" */
+export function formatCompactDuration(ms: number): string {
+  if (ms <= 0) return 'expired';
+
+  const totalSeconds = Math.floor(ms / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+
+  if (hours > 24) {
+    const days = Math.floor(hours / 24);
+    return `${days}d ${hours % 24}h`;
+  }
+  if (hours > 0) {
+    return minutes > 0 ? `${hours}h ${minutes}m` : `${hours}h`;
+  }
+  if (minutes > 0) {
+    return `${minutes} min`;
+  }
+  return `${totalSeconds}s`;
+}
+
 /**
  * Calculates current price, active window, next window, time remaining, and progress
  */
@@ -152,4 +173,19 @@ export function getPresetPricingSchedule(
         { durationMinutes: 180, price: 100, label: 'Final Window: $100' },
       ];
   }
+}
+
+/** MVP default: free now, then a two-step price increase until the deadline. */
+export function getStepUpPreset(deadlineHours: number): PricingWindowInput[] {
+  const totalMins = Math.max(60, Math.round(deadlineHours * 60));
+  const freeMins = Math.min(30, Math.max(15, Math.floor(totalMins * 0.15)));
+  const remaining = totalMins - freeMins;
+  const midMins = Math.max(15, Math.floor(remaining * 0.5));
+  const lastMins = Math.max(15, remaining - midMins);
+
+  return [
+    { durationMinutes: freeMins, price: 0, label: `FREE for ${freeMins} min` },
+    { durationMinutes: midMins, price: 25, label: `Then $25` },
+    { durationMinutes: lastMins, price: 75, label: `Then $75` },
+  ];
 }

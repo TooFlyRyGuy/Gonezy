@@ -1,7 +1,6 @@
-import { supabase, isSupabaseLive, disableSupabaseLiveMode, isSupabaseAuthOrKeyError } from '../lib/supabase';
+import { isPreviewMode, isSupabaseConfigured, supabase, throwLiveError } from '../lib/supabase';
 import { Category } from '../types/marketplace';
 
-// Default categories fallback if database seed hasn't been applied yet
 export const DEFAULT_CATEGORIES: Category[] = [
   { id: '1', slug: 'furniture', name: 'Furniture', description: 'Sofas, tables, chairs, dressers, bed frames', icon_name: 'Armchair', sort_order: 1, is_active: true, created_at: new Date().toISOString() },
   { id: '2', slug: 'appliances', name: 'Appliances', description: 'Refrigerators, washers, dryers, microwaves', icon_name: 'Refrigerator', sort_order: 2, is_active: true, created_at: new Date().toISOString() },
@@ -22,31 +21,20 @@ export const DEFAULT_CATEGORIES: Category[] = [
 
 export const categoryService = {
   async getCategories(): Promise<Category[]> {
-    if (!isSupabaseLive()) {
+    if (isPreviewMode() || !isSupabaseConfigured) {
       return DEFAULT_CATEGORIES;
     }
 
-    try {
-      const { data, error } = await supabase
-        .from('categories')
-        .select('*')
-        .eq('is_active', true)
-        .order('sort_order', { ascending: true });
+    const { data, error } = await supabase
+      .from('categories')
+      .select('*')
+      .eq('is_active', true)
+      .order('sort_order', { ascending: true });
 
-      if (error) {
-        if (isSupabaseAuthOrKeyError(error)) {
-          disableSupabaseLiveMode('Authentication required');
-        }
-        return DEFAULT_CATEGORIES;
-      }
-
-      return data && data.length > 0 ? data : DEFAULT_CATEGORIES;
-    } catch (err: any) {
-      if (isSupabaseAuthOrKeyError(err)) {
-        disableSupabaseLiveMode('Authentication required');
-      }
-      return DEFAULT_CATEGORIES;
+    if (error) {
+      throwLiveError(error, 'Could not load categories');
     }
+
+    return data && data.length > 0 ? data : DEFAULT_CATEGORIES;
   },
 };
-

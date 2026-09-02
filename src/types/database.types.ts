@@ -90,6 +90,7 @@ export interface Database {
           updated_at?: string;
         };
         Update: Partial<Database['public']['Tables']['profiles']['Insert']>;
+        Relationships: [];
       };
       categories: {
         Row: {
@@ -113,6 +114,7 @@ export interface Database {
           created_at?: string;
         };
         Update: Partial<Database['public']['Tables']['categories']['Insert']>;
+        Relationships: [];
       };
       listings: {
         Row: {
@@ -160,6 +162,7 @@ export interface Database {
           updated_at?: string;
         };
         Update: Partial<Database['public']['Tables']['listings']['Insert']>;
+        Relationships: [];
       };
       listing_images: {
         Row: {
@@ -177,6 +180,7 @@ export interface Database {
           created_at?: string;
         };
         Update: Partial<Database['public']['Tables']['listing_images']['Insert']>;
+        Relationships: [];
       };
       listing_price_windows: {
         Row: {
@@ -198,6 +202,7 @@ export interface Database {
           created_at?: string;
         };
         Update: Partial<Database['public']['Tables']['listing_price_windows']['Insert']>;
+        Relationships: [];
       };
       buyer_interests: {
         Row: {
@@ -227,6 +232,7 @@ export interface Database {
           updated_at?: string;
         };
         Update: Partial<Database['public']['Tables']['buyer_interests']['Insert']>;
+        Relationships: [];
       };
       claims: {
         Row: {
@@ -258,6 +264,7 @@ export interface Database {
           updated_at?: string;
         };
         Update: Partial<Database['public']['Tables']['claims']['Insert']>;
+        Relationships: [];
       };
       notifications: {
         Row: {
@@ -283,6 +290,7 @@ export interface Database {
           created_at?: string;
         };
         Update: Partial<Database['public']['Tables']['notifications']['Insert']>;
+        Relationships: [];
       };
     };
     Views: {
@@ -309,6 +317,7 @@ export interface Database {
           created_at: string;
           updated_at: string;
         };
+        Relationships: [];
       };
     };
     Functions: {
@@ -338,7 +347,17 @@ export interface Database {
         Args: Record<string, never>;
         Returns: number;
       };
+      expire_overdue_claims: {
+        Args: Record<string, never>;
+        Returns: number;
+      };
+      get_server_now: {
+        Args: Record<string, never>;
+        Returns: string;
+      };
     };
+    Enums: Record<string, never>;
+    CompositeTypes: Record<string, never>;
   };
 }
 

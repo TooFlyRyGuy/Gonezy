@@ -1,4 +1,4 @@
-import { supabase, isSupabaseLive, disableSupabaseLiveMode, isSupabaseAuthOrKeyError } from '../lib/supabase';
+import { isPreviewMode, isSupabaseConfigured, supabase, throwLiveError } from '../lib/supabase';
 
 export type NotificationType =
   | 'matching_item_posted'
@@ -64,49 +64,39 @@ export const notificationService = {
    * Fetch notifications for the active user
    */
   async getUserNotifications(userId: string): Promise<AppNotification[]> {
-    if (!isSupabaseLive()) {
+    if (isPreviewMode() || !isSupabaseConfigured) {
       return getLocalNotifications(userId);
     }
 
-    try {
-      const { data, error } = await supabase
-        .from('notifications')
-        .select('*')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false })
-        .limit(30);
+    const { data, error } = await supabase
+      .from('notifications')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(30);
 
-      if (error) {
-        if (isSupabaseAuthOrKeyError(error)) {
-          disableSupabaseLiveMode('Authentication required');
-        }
-        return getLocalNotifications(userId);
-      }
-
-      return (data || []).map((n: any) => ({
-        id: n.id,
-        userId: n.user_id,
-        type: n.type,
-        title: n.title,
-        body: n.body || '',
-        listingId: n.listing_id || undefined,
-        claimId: n.claim_id || undefined,
-        isRead: n.is_read,
-        createdAt: n.created_at,
-      }));
-    } catch (err: any) {
-      if (isSupabaseAuthOrKeyError(err)) {
-        disableSupabaseLiveMode('Authentication required');
-      }
-      return getLocalNotifications(userId);
+    if (error) {
+      throwLiveError(error, 'Could not load notifications');
     }
+
+    return (data || []).map((n: any) => ({
+      id: n.id,
+      userId: n.user_id,
+      type: n.type,
+      title: n.title,
+      body: n.body || '',
+      listingId: n.listing_id || undefined,
+      claimId: n.claim_id || undefined,
+      isRead: n.is_read,
+      createdAt: n.created_at,
+    }));
   },
 
   /**
    * Mark notification as read
    */
   async markAsRead(notificationId: string, userId?: string): Promise<void> {
-    if (!isSupabaseLive()) {
+    if (isPreviewMode() || !isSupabaseConfigured) {
       if (userId) {
         const notifs = getLocalNotifications(userId);
         saveLocalNotifications(
@@ -117,22 +107,15 @@ export const notificationService = {
       return;
     }
 
-    try {
-      await (supabase.from('notifications') as any)
-        .update({ is_read: true })
-        .eq('id', notificationId);
-    } catch (err: any) {
-      if (isSupabaseAuthOrKeyError(err)) {
-        disableSupabaseLiveMode('Authentication required');
-      }
-    }
+    const { error } = await supabase.from('notifications').update({ is_read: true }).eq('id', notificationId);
+    if (error) throwLiveError(error, 'Could not update notification');
   },
 
   /**
    * Mark all notifications as read for a user
    */
   async markAllAsRead(userId: string): Promise<void> {
-    if (!isSupabaseLive()) {
+    if (isPreviewMode() || !isSupabaseConfigured) {
       const notifs = getLocalNotifications(userId);
       saveLocalNotifications(
         userId,
@@ -141,15 +124,11 @@ export const notificationService = {
       return;
     }
 
-    try {
-      await (supabase.from('notifications') as any)
-        .update({ is_read: true })
-        .eq('user_id', userId)
-        .eq('is_read', false);
-    } catch (err: any) {
-      if (isSupabaseAuthOrKeyError(err)) {
-        disableSupabaseLiveMode('Authentication required');
-      }
-    }
+    const { error } = await supabase
+      .from('notifications')
+      .update({ is_read: true })
+      .eq('user_id', userId)
+      .eq('is_read', false);
+    if (error) throwLiveError(error, 'Could not update notifications');
   },
 };

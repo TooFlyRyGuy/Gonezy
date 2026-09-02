@@ -44,46 +44,27 @@ function isValidSupabaseKey(key: string): boolean {
   return true;
 }
 
-// Initial static validity check
-const initialConfigured = isValidSupabaseUrl(rawUrl) && isValidSupabaseKey(rawKey);
+export const isSupabaseConfigured = isValidSupabaseUrl(rawUrl) && isValidSupabaseKey(rawKey);
 
-// Dynamic live availability state (can be disabled if live backend returns 401/Invalid API key)
-let liveBackendAvailable = initialConfigured;
-
-export const isSupabaseConfigured = initialConfigured;
-
-export function isSupabaseLive(): boolean {
-  return liveBackendAvailable;
+/** Preview listings are allowed only when Supabase was never configured. */
+export function isPreviewMode(): boolean {
+  return !isSupabaseConfigured;
 }
 
-export function disableSupabaseLiveMode(reason?: string): void {
-  if (liveBackendAvailable) {
-    liveBackendAvailable = false;
-    console.info(`[Supabase] Switched to local demo mode.${reason ? ` (${reason})` : ''}`);
-  }
+export function liveErrorMessage(error: unknown, fallback: string): string {
+  if (!error) return fallback;
+  if (typeof error === 'string') return error;
+  const maybe = error as { message?: string };
+  return maybe.message || fallback;
 }
 
-export function isSupabaseAuthOrKeyError(error: any): boolean {
-  if (!error) return false;
-  const msg = typeof error === 'string' ? error : (error.message || JSON.stringify(error));
-  const lower = msg.toLowerCase();
-  return (
-    lower.includes('invalid api key') ||
-    lower.includes('jwt') ||
-    lower.includes('unauthorized') ||
-    lower.includes('api key not found') ||
-    lower.includes('bearer token') ||
-    lower.includes('apikey') ||
-    error.code === 'PGRST301' ||
-    error.status === 401 ||
-    error.status === 403
-  );
+export function throwLiveError(error: unknown, fallback: string): never {
+  throw new Error(liveErrorMessage(error, fallback));
 }
 
-// Create the Supabase client
 export const supabase = createClient<Database>(
-  initialConfigured ? rawUrl : 'https://placeholder.supabase.co',
-  initialConfigured ? rawKey : 'placeholder-anon-key',
+  isSupabaseConfigured ? rawUrl : 'https://placeholder.supabase.co',
+  isSupabaseConfigured ? rawKey : 'placeholder-anon-key',
   {
     auth: {
       persistSession: true,
@@ -92,4 +73,3 @@ export const supabase = createClient<Database>(
     },
   }
 );
-

@@ -79,7 +79,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             </h2>
             <p className="text-xs text-slate-400 mt-0.5">
               {mode === 'signin' && 'Sign in to claim urgent items or post listings'}
-              {mode === 'signup' && 'Join the hyperlocal urgency marketplace'}
+              {mode === 'signup' && 'Post items or claim nearby pickups'}
               {mode === 'forgot' && 'We will send a reset link to your email'}
             </p>
           </div>
@@ -245,38 +245,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             )}
           </button>
         </form>
-
-        {mode === 'signin' && (
-          <div className="bg-white/5 rounded-2xl p-3.5 border border-white/5 space-y-2">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
-              Quick Sign-In with Seeded Live DB Accounts:
-            </span>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  setEmail('marcus@apexcleanouts.com');
-                  setPassword('Password123!');
-                }}
-                className="text-left px-2.5 py-1.5 rounded-xl bg-white/5 hover:bg-orange-500/20 hover:border-orange-500/40 border border-white/5 transition-all text-xs"
-              >
-                <span className="font-bold text-slate-200 block truncate">Marcus (Seller)</span>
-                <span className="text-[10px] text-slate-400 block truncate">Apex Cleanouts</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setEmail('buyer.demo@example.com');
-                  setPassword('Password123!');
-                }}
-                className="text-left px-2.5 py-1.5 rounded-xl bg-white/5 hover:bg-orange-500/20 hover:border-orange-500/40 border border-white/5 transition-all text-xs"
-              >
-                <span className="font-bold text-slate-200 block truncate">Alex (Buyer)</span>
-                <span className="text-[10px] text-slate-400 block truncate">Bay Area Salvage</span>
-              </button>
-            </div>
-          </div>
-        )}
 
         <div className="text-center pt-2 border-t border-white/5 text-xs text-slate-400">
           {mode === 'signin' ? (
