@@ -31,9 +31,9 @@ export const CountdownBadge: React.FC<CountdownBadgeProps> = ({
     return (
       <span
         id={`countdown-expired-${listing.id}`}
-        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-neutral-800 text-neutral-400 border border-neutral-700"
+        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-white/5 text-slate-400 border border-white/10 backdrop-blur-md"
       >
-        <AlertTriangle className="w-3 h-3 text-neutral-400" />
+        <AlertTriangle className="w-3 h-3 text-slate-400" />
         Disposed / Expired
       </span>
     );
@@ -43,15 +43,15 @@ export const CountdownBadge: React.FC<CountdownBadgeProps> = ({
   const isFreeNow = state.isFree;
   const isLastWindow = !state.nextWindow;
 
-  let bgClass = 'bg-amber-500/15 text-amber-300 border-amber-500/30';
-  let dotClass = 'bg-amber-400';
+  let bgClass = 'bg-orange-500/15 text-orange-400 border-orange-500/30';
+  let dotClass = 'bg-orange-500 shadow-[0_0_8px_#f97316]';
 
   if (isFreeNow) {
-    bgClass = 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30 animate-pulse';
-    dotClass = 'bg-emerald-400';
+    bgClass = 'bg-green-500/15 text-green-400 border-green-500/30';
+    dotClass = 'bg-green-400 shadow-[0_0_8px_#4ade80]';
   } else if (isLastWindow) {
-    bgClass = 'bg-rose-500/15 text-rose-300 border-rose-500/30';
-    dotClass = 'bg-rose-400';
+    bgClass = 'bg-red-500/15 text-red-400 border-red-500/30';
+    dotClass = 'bg-red-500 shadow-[0_0_8px_#ef4444]';
   }
 
   const nextPriceText = state.nextWindow
@@ -61,14 +61,14 @@ export const CountdownBadge: React.FC<CountdownBadgeProps> = ({
   return (
     <div
       id={`countdown-badge-${listing.id}`}
-      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-medium backdrop-blur-md ${bgClass}`}
+      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-medium backdrop-blur-md ${bgClass}`}
     >
-      <span className={`w-1.5 h-1.5 rounded-full ${dotClass} animate-ping`} />
-      <Clock className="w-3 h-3 shrink-0" />
-      <span className="font-mono font-bold tracking-tight">
+      <span className={`w-2 h-2 rounded-full ${dotClass} animate-pulse`} />
+      <Clock className="w-3.5 h-3.5 shrink-0" />
+      <span className="font-mono font-bold tracking-tight text-white">
         {state.timeRemainingFormatted}
       </span>
-      <span className="text-[10px] opacity-75 font-normal">
+      <span className="text-[10px] opacity-80 font-normal">
         ({nextPriceText})
       </span>
     </div>

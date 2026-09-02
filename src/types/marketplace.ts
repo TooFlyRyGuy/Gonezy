@@ -1,4 +1,4 @@
-import { Database, AccountType, BusinessType, ItemCondition, ListingStatus, ClaimStatus, ClaimState } from './database.types';
+import { Database, AccountType, BusinessType, ItemCondition, ListingStatus, ClaimState } from './database.types';
 
 export type Profile = Database['public']['Tables']['profiles']['Row'];
 export type Category = Database['public']['Tables']['categories']['Row'];

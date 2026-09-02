@@ -1,4 +1,4 @@
-import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { supabase, isSupabaseLive, disableSupabaseLiveMode, isSupabaseAuthOrKeyError } from '../lib/supabase';
 import { Claim, ListingWithDetails } from '../types/marketplace';
 import { listingService } from './listingService';
 
@@ -20,12 +20,37 @@ export interface ClaimWithListing extends Claim {
   };
 }
 
+const LOCAL_CLAIMS_KEY = 'gonezy_local_claims';
+
+function getLocalClaims(): ClaimWithListing[] {
+  try {
+    const raw = localStorage.getItem(LOCAL_CLAIMS_KEY) || localStorage.getItem('nabgo_local_claims');
+    if (raw) return JSON.parse(raw);
+  } catch (e) {}
+  return [];
+}
+
+function saveLocalClaim(claim: ClaimWithListing): void {
+  try {
+    const existing = getLocalClaims();
+    localStorage.setItem(LOCAL_CLAIMS_KEY, JSON.stringify([claim, ...existing.filter((c) => c.id !== claim.id)]));
+  } catch (e) {}
+}
+
+function updateLocalClaimStatus(claimId: string, status: string): void {
+  try {
+    const existing = getLocalClaims();
+    const updated = existing.map((c) => (c.id === claimId ? { ...c, status: status as any } : c));
+    localStorage.setItem(LOCAL_CLAIMS_KEY, JSON.stringify(updated));
+  } catch (e) {}
+}
+
 export const claimService = {
   /**
    * Atomic claim creation
    */
   async claimListing(listingId: string, buyerId: string): Promise<ClaimResult> {
-    if (!isSupabaseConfigured) {
+    if (!isSupabaseLive()) {
       // Demo simulated claim
       const listing = await listingService.getListingById(listingId);
       if (!listing) return { success: false, error: 'Listing not found' };
@@ -33,9 +58,35 @@ export const claimService = {
       
       const now = new Date();
       const pickupExpiresAt = new Date(now.getTime() + 2 * 60 * 60 * 1000).toISOString();
+      const claimId = 'claim-demo-' + Date.now();
+
+      const newClaim: ClaimWithListing = {
+        id: claimId,
+        listing_id: listingId,
+        buyer_id: buyerId,
+        price_at_claim: listing.current_price,
+        status: 'active',
+        claimed_at: now.toISOString(),
+        pickup_expires_at: pickupExpiresAt,
+        completed_at: null,
+        cancellation_reason: null,
+        cancelled_at: null,
+        created_at: now.toISOString(),
+        updated_at: now.toISOString(),
+        listing: listing,
+        buyer: {
+          id: buyerId,
+          display_name: 'Alex Rivera',
+          phone: '(415) 890-1234',
+          avatar_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80',
+        },
+      };
+
+      saveLocalClaim(newClaim);
+
       return {
         success: true,
-        claimId: 'claim-demo-' + Date.now(),
+        claimId,
         priceAtClaim: listing.current_price,
         pickupExpiresAt,
       };
@@ -49,6 +100,10 @@ export const claimService = {
       });
 
       if (error) {
+        if (isSupabaseAuthOrKeyError(error)) {
+          disableSupabaseLiveMode('Authentication required');
+          return this.claimListing(listingId, buyerId);
+        }
         // If RPC function not loaded yet, execute client transaction fallback
         console.warn('RPC claim_listing failed, executing fallback insert:', error.message);
         return await fallbackClaim(listingId, buyerId);
@@ -65,7 +120,11 @@ export const claimService = {
         pickupExpiresAt: data.pickup_expires_at,
       };
     } catch (err: any) {
-      console.error('Claim exception:', err);
+      if (isSupabaseAuthOrKeyError(err)) {
+        disableSupabaseLiveMode('Authentication required');
+        return this.claimListing(listingId, buyerId);
+      }
+      console.warn('Claim notice:', err.message || err);
       return { success: false, error: err.message || 'Error processing claim' };
     }
   },
@@ -74,8 +133,9 @@ export const claimService = {
    * Fetch buyer's claims
    */
   async getBuyerClaims(buyerId: string): Promise<ClaimWithListing[]> {
-    if (!isSupabaseConfigured) {
-      return [];
+    if (!isSupabaseLive()) {
+      const local = getLocalClaims().filter((c) => c.buyer_id === buyerId);
+      return local;
     }
 
     try {
@@ -94,8 +154,12 @@ export const claimService = {
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Error fetching buyer claims:', error);
-        return [];
+        if (isSupabaseAuthOrKeyError(error)) {
+          disableSupabaseLiveMode('Authentication required');
+          return getLocalClaims().filter((c) => c.buyer_id === buyerId);
+        }
+        console.warn('Notice fetching buyer claims:', error.message);
+        return getLocalClaims().filter((c) => c.buyer_id === buyerId);
       }
 
       return (data || []).map((c: any) => ({
@@ -105,9 +169,11 @@ export const claimService = {
           images: c.listing?.images || [],
         },
       }));
-    } catch (err) {
-      console.error('Buyer claims fetch error:', err);
-      return [];
+    } catch (err: any) {
+      if (isSupabaseAuthOrKeyError(err)) {
+        disableSupabaseLiveMode('Authentication required');
+      }
+      return getLocalClaims().filter((c) => c.buyer_id === buyerId);
     }
   },
 
@@ -115,7 +181,10 @@ export const claimService = {
    * Fetch seller's received claims
    */
   async getSellerReceivedClaims(sellerId: string): Promise<ClaimWithListing[]> {
-    if (!isSupabaseConfigured) return [];
+    if (!isSupabaseLive()) {
+      const local = getLocalClaims().filter((c) => c.listing?.seller_id === sellerId);
+      return local;
+    }
 
     try {
       const { data, error } = await supabase
@@ -133,8 +202,11 @@ export const claimService = {
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Error fetching seller claims:', error);
-        return [];
+        if (isSupabaseAuthOrKeyError(error)) {
+          disableSupabaseLiveMode('Authentication required');
+          return getLocalClaims().filter((c) => c.listing?.seller_id === sellerId);
+        }
+        return getLocalClaims().filter((c) => c.listing?.seller_id === sellerId);
       }
 
       return (data || []).map((c: any) => ({
@@ -144,9 +216,11 @@ export const claimService = {
           images: c.listing?.images || [],
         },
       }));
-    } catch (err) {
-      console.error('Seller claims fetch error:', err);
-      return [];
+    } catch (err: any) {
+      if (isSupabaseAuthOrKeyError(err)) {
+        disableSupabaseLiveMode('Authentication required');
+      }
+      return getLocalClaims().filter((c) => c.listing?.seller_id === sellerId);
     }
   },
 
@@ -154,7 +228,10 @@ export const claimService = {
    * Complete pickup
    */
   async completePickup(claimId: string, userId: string): Promise<boolean> {
-    if (!isSupabaseConfigured) return true;
+    if (!isSupabaseLive()) {
+      updateLocalClaimStatus(claimId, 'completed');
+      return true;
+    }
 
     try {
       const { data, error } = await (supabase.rpc as any)('complete_pickup', {
@@ -163,6 +240,11 @@ export const claimService = {
       });
 
       if (error) {
+        if (isSupabaseAuthOrKeyError(error)) {
+          disableSupabaseLiveMode('Authentication required');
+          updateLocalClaimStatus(claimId, 'completed');
+          return true;
+        }
         // Fallback update
         await (supabase.from('claims') as any)
           .update({ status: 'completed', completed_at: new Date().toISOString() })
@@ -171,8 +253,12 @@ export const claimService = {
       }
 
       return Boolean(data?.success);
-    } catch (err) {
-      console.error('Error completing pickup:', err);
+    } catch (err: any) {
+      if (isSupabaseAuthOrKeyError(err)) {
+        disableSupabaseLiveMode('Authentication required');
+        updateLocalClaimStatus(claimId, 'completed');
+        return true;
+      }
       return false;
     }
   },
@@ -181,7 +267,10 @@ export const claimService = {
    * Cancel claim
    */
   async cancelClaim(claimId: string, listingId: string, reason?: string): Promise<boolean> {
-    if (!isSupabaseConfigured) return true;
+    if (!isSupabaseLive()) {
+      updateLocalClaimStatus(claimId, 'cancelled');
+      return true;
+    }
 
     try {
       await (supabase.from('claims') as any)
@@ -201,8 +290,12 @@ export const claimService = {
         .eq('id', listingId);
 
       return true;
-    } catch (err) {
-      console.error('Error cancelling claim:', err);
+    } catch (err: any) {
+      if (isSupabaseAuthOrKeyError(err)) {
+        disableSupabaseLiveMode('Authentication required');
+        updateLocalClaimStatus(claimId, 'cancelled');
+        return true;
+      }
       return false;
     }
   },
@@ -256,3 +349,4 @@ async function fallbackClaim(listingId: string, buyerId: string): Promise<ClaimR
     pickupExpiresAt,
   };
 }
+

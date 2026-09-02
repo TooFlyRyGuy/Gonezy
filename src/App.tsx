@@ -119,7 +119,7 @@ function MarketplaceApp() {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-neutral-100 flex flex-col selection:bg-amber-500 selection:text-neutral-950 pb-20 lg:pb-8">
+    <div className="min-h-screen bg-[#05060B] text-slate-100 flex flex-col selection:bg-orange-500 selection:text-white pb-20 lg:pb-8 font-sans">
       {/* Top Header */}
       <Header
         currentTab={currentTab}
@@ -136,18 +136,18 @@ function MarketplaceApp() {
         {currentTab === 'explore' && (
           <div className="space-y-6">
             {/* Live Urgency Ticker Banner */}
-            <div className="p-4 sm:p-5 rounded-3xl bg-radial from-amber-500/15 via-neutral-900 to-neutral-900 border border-amber-500/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-lg shadow-amber-500/5">
-              <div className="space-y-1">
+            <div className="p-5 sm:p-6 rounded-3xl bg-radial from-orange-500/15 via-[#0A0C14] to-[#0A0C14] border border-orange-500/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-[0_0_30px_rgba(249,115,22,0.1)]">
+              <div className="space-y-1.5">
                 <div className="flex items-center gap-2">
                   <span className="flex h-2.5 w-2.5 relative">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-orange-500"></span>
                   </span>
-                  <span className="text-xs font-mono font-bold uppercase tracking-wider text-amber-400">
+                  <span className="text-xs font-mono font-bold uppercase tracking-wider text-orange-400">
                     Hyperlocal Live Urgency Feed
                   </span>
                 </div>
-                <h2 className="text-base sm:text-lg font-extrabold text-neutral-100">
+                <h2 className="text-base sm:text-lg font-black text-white tracking-tight">
                   Items must be picked up before deadlines. Prices escalate over time!
                 </h2>
               </div>
@@ -156,23 +156,23 @@ function MarketplaceApp() {
                 <button
                   id="filter-free-only-btn"
                   onClick={() => setOnlyFree(!onlyFree)}
-                  className={`flex-1 md:flex-none flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  className={`flex-1 md:flex-none flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-2xl text-xs font-black transition-all cursor-pointer ${
                     onlyFree
-                      ? 'bg-emerald-500 text-neutral-950 shadow-md shadow-emerald-500/20'
-                      : 'bg-neutral-900 hover:bg-neutral-800 text-neutral-300 border border-neutral-800'
+                      ? 'bg-green-500 text-white shadow-[0_0_15px_rgba(74,222,128,0.4)]'
+                      : 'bg-white/5 hover:bg-white/10 text-slate-300 border border-white/5'
                   }`}
                 >
-                  <Flame className="w-3.5 h-3.5" />
+                  <Flame className="w-4 h-4" />
                   <span>Free Right Now ({listings.filter((l) => l.current_price === 0).length})</span>
                 </button>
 
                 <button
                   id="refresh-feed-btn"
                   onClick={loadData}
-                  className="p-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-neutral-300 border border-neutral-800 transition-colors cursor-pointer"
+                  className="p-2.5 rounded-2xl bg-white/5 hover:bg-white/10 text-slate-300 border border-white/5 transition-colors cursor-pointer"
                   title="Refresh listings"
                 >
-                  <RefreshCw className={`w-4 h-4 ${isLoadingListings ? 'animate-spin' : ''}`} />
+                  <RefreshCw className={`w-4 h-4 ${isLoadingListings ? 'animate-spin text-orange-400' : ''}`} />
                 </button>
               </div>
             </div>
@@ -180,13 +180,13 @@ function MarketplaceApp() {
             {/* Mobile Search input */}
             <div className="md:hidden">
               <div className="relative">
-                <Search className="w-4 h-4 text-neutral-500 absolute left-3.5 top-3" />
+                <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-3.5" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search tools, furniture, scrap..."
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-neutral-900 border border-neutral-800 text-xs text-neutral-100 placeholder-neutral-500 focus:outline-hidden focus:border-amber-500"
+                  className="w-full pl-10 pr-4 py-3 rounded-2xl bg-[#0A0C14] border border-white/10 text-xs text-white placeholder-slate-500 focus:outline-hidden focus:border-orange-500 shadow-inner"
                 />
               </div>
             </div>
@@ -201,9 +201,9 @@ function MarketplaceApp() {
             </div>
 
             {/* Sort & Count Header */}
-            <div className="flex items-center justify-between text-xs text-neutral-400 pt-1">
+            <div className="flex items-center justify-between text-xs text-slate-400 pt-1">
               <span className="font-medium">
-                Showing <strong className="text-neutral-200">{filteredListings.length}</strong> urgent item{filteredListings.length === 1 ? '' : 's'} nearby
+                Showing <strong className="text-white font-bold">{filteredListings.length}</strong> urgent item{filteredListings.length === 1 ? '' : 's'} nearby
               </span>
 
               <div className="flex items-center gap-2">
@@ -211,7 +211,7 @@ function MarketplaceApp() {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as any)}
-                  className="px-2.5 py-1.5 rounded-lg bg-neutral-900 border border-neutral-800 text-xs text-neutral-300 focus:outline-hidden cursor-pointer"
+                  className="px-3 py-1.5 rounded-xl bg-[#0A0C14] border border-white/10 text-xs text-slate-200 focus:outline-hidden cursor-pointer"
                 >
                   <option value="urgent">Most Urgent (Time Left)</option>
                   <option value="distance">Nearest Distance</option>
@@ -224,14 +224,14 @@ function MarketplaceApp() {
             {isLoadingListings ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
                 {[1, 2, 3, 4].map((n) => (
-                  <div key={n} className="aspect-4/3 rounded-2xl bg-neutral-900 animate-pulse border border-neutral-800" />
+                  <div key={n} className="aspect-4/3 rounded-3xl bg-[#0A0C14] animate-pulse border border-white/5" />
                 ))}
               </div>
             ) : filteredListings.length === 0 ? (
-              <div className="p-16 rounded-3xl bg-neutral-900/40 border border-neutral-800 text-center space-y-4">
-                <Zap className="w-12 h-12 text-neutral-600 mx-auto" />
-                <h3 className="text-base font-bold text-neutral-200">No matching items right now</h3>
-                <p className="text-xs text-neutral-400 max-w-sm mx-auto">
+              <div className="p-16 rounded-3xl bg-[#0A0C14] border border-white/5 text-center space-y-4">
+                <Zap className="w-12 h-12 text-slate-600 mx-auto" />
+                <h3 className="text-base font-bold text-white">No matching items right now</h3>
+                <p className="text-xs text-slate-400 max-w-sm mx-auto">
                   Try clearing your filters, expanding your category search, or set an alert in the Wanted tab.
                 </p>
                 <button
@@ -240,7 +240,7 @@ function MarketplaceApp() {
                     setOnlyFree(false);
                     setSearchQuery('');
                   }}
-                  className="px-4 py-2 rounded-xl text-xs font-bold bg-neutral-800 hover:bg-neutral-700 text-neutral-200 cursor-pointer"
+                  className="px-4 py-2.5 rounded-2xl text-xs font-bold bg-white/10 hover:bg-white/20 text-white cursor-pointer border border-white/10 transition-colors"
                 >
                   Clear All Filters
                 </button>

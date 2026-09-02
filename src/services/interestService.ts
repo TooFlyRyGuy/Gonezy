@@ -1,4 +1,4 @@
-import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { supabase, isSupabaseLive, disableSupabaseLiveMode, isSupabaseAuthOrKeyError } from '../lib/supabase';
 import { BuyerInterest } from '../types/marketplace';
 
 export interface CreateInterestInput {
@@ -10,10 +10,34 @@ export interface CreateInterestInput {
   longitude?: number | null;
 }
 
+const LOCAL_INTERESTS_KEY = 'gonezy_user_interests';
+
+function getLocalStoredInterests(userId: string): BuyerInterest[] {
+  try {
+    const raw =
+      localStorage.getItem(`${LOCAL_INTERESTS_KEY}_${userId}`) ||
+      localStorage.getItem(`nabgo_user_interests_${userId}`);
+    if (raw) {
+      return JSON.parse(raw);
+    }
+  } catch (e) {
+    // Ignore localStorage parse error
+  }
+  return getDemoInterests(userId);
+}
+
+function saveLocalStoredInterests(userId: string, items: BuyerInterest[]): void {
+  try {
+    localStorage.setItem(`${LOCAL_INTERESTS_KEY}_${userId}`, JSON.stringify(items));
+  } catch (e) {
+    // Ignore quota errors
+  }
+}
+
 export const interestService = {
   async getUserInterests(userId: string): Promise<BuyerInterest[]> {
-    if (!isSupabaseConfigured) {
-      return getDemoInterests(userId);
+    if (!isSupabaseLive()) {
+      return getLocalStoredInterests(userId);
     }
 
     try {
@@ -24,19 +48,25 @@ export const interestService = {
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Error fetching buyer interests:', error);
-        return getDemoInterests(userId);
+        if (isSupabaseAuthOrKeyError(error)) {
+          disableSupabaseLiveMode('Authentication required');
+        } else {
+          console.warn('Buyer interests fetch issue:', error.message);
+        }
+        return getLocalStoredInterests(userId);
       }
 
       return data || [];
-    } catch (err) {
-      console.error('Interests query error:', err);
-      return getDemoInterests(userId);
+    } catch (err: any) {
+      if (isSupabaseAuthOrKeyError(err)) {
+        disableSupabaseLiveMode('Authentication required');
+      }
+      return getLocalStoredInterests(userId);
     }
   },
 
   async createInterest(userId: string, input: CreateInterestInput): Promise<BuyerInterest> {
-    if (!isSupabaseConfigured) {
+    if (!isSupabaseLive()) {
       const demo: BuyerInterest = {
         id: 'interest-' + Date.now(),
         user_id: userId,
@@ -50,48 +80,107 @@ export const interestService = {
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };
+      const existing = getLocalStoredInterests(userId);
+      saveLocalStoredInterests(userId, [demo, ...existing]);
       return demo;
     }
 
-    const { data, error } = await (supabase.from('buyer_interests') as any)
-      .insert({
-        user_id: userId,
-        search_text: input.search_text,
-        category_id: input.category_id || null,
-        max_price: input.max_price || null,
-        radius_miles: input.radius_miles || 25,
-        latitude: input.latitude || null,
-        longitude: input.longitude || null,
-        is_active: true,
-      })
-      .select()
-      .single();
+    try {
+      const { data, error } = await (supabase.from('buyer_interests') as any)
+        .insert({
+          user_id: userId,
+          search_text: input.search_text,
+          category_id: input.category_id || null,
+          max_price: input.max_price || null,
+          radius_miles: input.radius_miles || 25,
+          latitude: input.latitude || null,
+          longitude: input.longitude || null,
+          is_active: true,
+        })
+        .select()
+        .single();
 
-    if (error) {
-      console.error('Error creating interest:', error);
-      throw error;
+      if (error) {
+        if (isSupabaseAuthOrKeyError(error)) {
+          disableSupabaseLiveMode('Authentication required');
+          return this.createInterest(userId, input);
+        }
+        throw error;
+      }
+
+      return data;
+    } catch (err: any) {
+      if (isSupabaseAuthOrKeyError(err)) {
+        disableSupabaseLiveMode('Authentication required');
+        return this.createInterest(userId, input);
+      }
+      throw err;
     }
-
-    return data;
   },
 
-  async toggleActive(interestId: string, isActive: boolean): Promise<void> {
-    if (!isSupabaseConfigured) return;
-    const { error } = await (supabase.from('buyer_interests') as any)
-      .update({ is_active: isActive, updated_at: new Date().toISOString() })
-      .eq('id', interestId);
+  async toggleActive(interestId: string, isActive: boolean, userId?: string): Promise<void> {
+    if (!isSupabaseLive()) {
+      if (userId) {
+        const existing = getLocalStoredInterests(userId);
+        saveLocalStoredInterests(
+          userId,
+          existing.map((item) => (item.id === interestId ? { ...item, is_active: isActive } : item))
+        );
+      }
+      return;
+    }
+    try {
+      const { error } = await (supabase.from('buyer_interests') as any)
+        .update({ is_active: isActive, updated_at: new Date().toISOString() })
+        .eq('id', interestId);
 
-    if (error) throw error;
+      if (error) {
+        if (isSupabaseAuthOrKeyError(error)) {
+          disableSupabaseLiveMode('Authentication required');
+        } else {
+          throw error;
+        }
+      }
+    } catch (err: any) {
+      if (isSupabaseAuthOrKeyError(err)) {
+        disableSupabaseLiveMode('Authentication required');
+      } else {
+        throw err;
+      }
+    }
   },
 
-  async deleteInterest(interestId: string): Promise<void> {
-    if (!isSupabaseConfigured) return;
-    const { error } = await supabase
-      .from('buyer_interests')
-      .delete()
-      .eq('id', interestId);
+  async deleteInterest(interestId: string, userId?: string): Promise<void> {
+    if (!isSupabaseLive()) {
+      if (userId) {
+        const existing = getLocalStoredInterests(userId);
+        saveLocalStoredInterests(
+          userId,
+          existing.filter((item) => item.id !== interestId)
+        );
+      }
+      return;
+    }
+    try {
+      const { error } = await supabase
+        .from('buyer_interests')
+        .delete()
+        .eq('id', interestId);
 
-    if (error) throw error;
+      if (error) {
+        if (isSupabaseAuthOrKeyError(error)) {
+          disableSupabaseLiveMode('Authentication required');
+        } else {
+          throw error;
+        }
+      }
+    } catch (err: any) {
+      if (isSupabaseAuthOrKeyError(err)) {
+        disableSupabaseLiveMode('Authentication required');
+      } else {
+        throw err;
+      }
+    }
   },
 };
 
@@ -125,3 +214,4 @@ function getDemoInterests(userId: string): BuyerInterest[] {
     },
   ];
 }
+

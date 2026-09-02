@@ -160,14 +160,14 @@ export const CreateListingWizard: React.FC<CreateListingWizardProps> = ({
   const totalScheduleHours = (totalScheduleMins / 60).toFixed(1);
 
   return (
-    <div id="create-listing-wizard" className="w-full max-w-2xl mx-auto bg-neutral-900 border border-neutral-800 rounded-3xl p-5 sm:p-7 shadow-2xl space-y-6">
+    <div id="create-listing-wizard" className="w-full max-w-2xl mx-auto bg-[#0A0C14] border border-white/5 rounded-3xl p-5 sm:p-7 shadow-2xl space-y-6">
       {/* Wizard Step Progress */}
-      <div className="flex items-center justify-between border-b border-neutral-800 pb-4">
+      <div className="flex items-center justify-between border-b border-white/5 pb-4">
         <div>
-          <span className="text-xs font-mono font-bold text-amber-400 uppercase tracking-wider">
+          <span className="text-xs font-mono font-black text-orange-400 uppercase tracking-wider">
             Step {step} of 5
           </span>
-          <h2 className="text-xl font-extrabold text-neutral-100">
+          <h2 className="text-xl font-black text-white">
             {step === 1 && 'Upload Photos'}
             {step === 2 && 'Item Information'}
             {step === 3 && 'Pickup & Location'}
@@ -178,15 +178,15 @@ export const CreateListingWizard: React.FC<CreateListingWizardProps> = ({
 
         <button
           onClick={onCancel}
-          className="text-xs font-medium text-neutral-400 hover:text-neutral-200 px-3 py-1.5 rounded-lg bg-neutral-800 transition-colors cursor-pointer"
+          className="text-xs font-bold text-slate-400 hover:text-white px-3.5 py-2 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/5 transition-colors cursor-pointer"
         >
           Cancel
         </button>
       </div>
 
       {errorMessage && (
-        <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-xs text-rose-300 flex items-center gap-2">
-          <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
+        <div className="p-3.5 rounded-2xl bg-red-500/10 border border-red-500/30 text-xs text-red-300 flex items-center gap-2">
+          <AlertCircle className="w-4 h-4 shrink-0 text-red-400" />
           <span>{errorMessage}</span>
         </div>
       )}
@@ -194,7 +194,7 @@ export const CreateListingWizard: React.FC<CreateListingWizardProps> = ({
       {/* STEP 1: PHOTOS */}
       {step === 1 && (
         <div className="space-y-4">
-          <div className="border-2 border-dashed border-neutral-700 hover:border-amber-500/60 rounded-2xl p-6 text-center transition-colors bg-neutral-950/40">
+          <div className="border-2 border-dashed border-white/10 hover:border-orange-500/60 rounded-3xl p-6 text-center transition-colors bg-[#05060B]">
             <input
               type="file"
               id="photo-upload-input"
@@ -207,13 +207,13 @@ export const CreateListingWizard: React.FC<CreateListingWizardProps> = ({
               htmlFor="photo-upload-input"
               className="flex flex-col items-center justify-center cursor-pointer space-y-2"
             >
-              <div className="p-3 rounded-full bg-amber-500/10 text-amber-400">
+              <div className="p-3.5 rounded-2xl bg-orange-500/15 text-orange-400 border border-orange-500/30 shadow-[0_0_15px_rgba(249,115,22,0.2)]">
                 <Upload className="w-6 h-6" />
               </div>
-              <span className="text-sm font-bold text-neutral-200">
+              <span className="text-sm font-bold text-white">
                 Click or drag & drop item photos
               </span>
-              <span className="text-xs text-neutral-400">
+              <span className="text-xs text-slate-400">
                 High clarity pictures increase quick claim rates by 80%
               </span>
             </label>
@@ -223,7 +223,7 @@ export const CreateListingWizard: React.FC<CreateListingWizardProps> = ({
           {photoPreviews.length > 0 && (
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-neutral-400">
+                <span className="text-xs font-bold text-slate-400">
                   {photoPreviews.length} photo{photoPreviews.length > 1 ? 's' : ''} uploaded
                 </span>
 
@@ -231,7 +231,7 @@ export const CreateListingWizard: React.FC<CreateListingWizardProps> = ({
                   type="button"
                   onClick={handleAIAssist}
                   disabled={isAnalyzingAI}
-                  className="flex items-center gap-1.5 text-xs font-bold text-amber-400 hover:text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 px-3 py-1.5 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+                  className="flex items-center gap-1.5 text-xs font-black text-orange-300 hover:text-orange-200 bg-orange-500/20 hover:bg-orange-500/30 border border-orange-500/40 px-3.5 py-1.5 rounded-2xl transition-colors cursor-pointer disabled:opacity-50 shadow-[0_0_10px_rgba(249,115,22,0.2)]"
                 >
                   <Sparkles className="w-3.5 h-3.5" />
                   <span>{isAnalyzingAI ? 'Analyzing item...' : 'AI Auto-Fill Details'}</span>
@@ -240,12 +240,12 @@ export const CreateListingWizard: React.FC<CreateListingWizardProps> = ({
 
               <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
                 {photoPreviews.map((url, i) => (
-                  <div key={i} className="relative aspect-square rounded-xl overflow-hidden border border-neutral-700 bg-neutral-950 group">
+                  <div key={i} className="relative aspect-square rounded-2xl overflow-hidden border border-white/10 bg-[#05060B] group shadow-md">
                     <img src={url} alt="Preview" className="w-full h-full object-cover" />
                     <button
                       type="button"
                       onClick={() => removePhoto(i)}
-                      className="absolute top-1 right-1 p-1 rounded-full bg-neutral-900/80 text-rose-400 hover:bg-rose-500 hover:text-white transition-colors cursor-pointer"
+                      className="absolute top-1.5 right-1.5 p-1.5 rounded-xl bg-black/80 text-red-400 hover:bg-red-500 hover:text-white transition-colors cursor-pointer border border-white/10"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -261,7 +261,7 @@ export const CreateListingWizard: React.FC<CreateListingWizardProps> = ({
       {step === 2 && (
         <div className="space-y-4">
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-1">
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
               Item Title *
             </label>
             <input
@@ -270,20 +270,20 @@ export const CreateListingWizard: React.FC<CreateListingWizardProps> = ({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g., Solid Oak Office Desk & Swivel Chair"
-              className="w-full px-4 py-3 rounded-xl bg-neutral-950 border border-neutral-800 text-neutral-100 placeholder-neutral-500 focus:outline-hidden focus:border-amber-500 text-sm"
+              className="w-full px-4 py-3 rounded-2xl bg-[#05060B] border border-white/10 text-white placeholder-slate-500 focus:outline-hidden focus:border-orange-500 text-sm"
             />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-1">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
                 Category
               </label>
               <select
                 id="listing-category-select"
                 value={categoryId}
                 onChange={(e) => setCategoryId(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl bg-neutral-950 border border-neutral-800 text-neutral-100 focus:outline-hidden focus:border-amber-500 text-sm"
+                className="w-full px-4 py-3 rounded-2xl bg-[#05060B] border border-white/10 text-white focus:outline-hidden focus:border-orange-500 text-sm cursor-pointer"
               >
                 {categories.map((c) => (
                   <option key={c.id} value={c.id}>
@@ -294,14 +294,14 @@ export const CreateListingWizard: React.FC<CreateListingWizardProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-1">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
                 Condition
               </label>
               <select
                 id="listing-condition-select"
                 value={condition}
                 onChange={(e) => setCondition(e.target.value as ItemCondition)}
-                className="w-full px-4 py-3 rounded-xl bg-neutral-950 border border-neutral-800 text-neutral-100 focus:outline-hidden focus:border-amber-500 text-sm"
+                className="w-full px-4 py-3 rounded-2xl bg-[#05060B] border border-white/10 text-white focus:outline-hidden focus:border-orange-500 text-sm cursor-pointer"
               >
                 <option value="like_new">Like New (Mint / Unused)</option>
                 <option value="good">Good (Normal wear, fully functional)</option>
@@ -313,7 +313,7 @@ export const CreateListingWizard: React.FC<CreateListingWizardProps> = ({
           </div>
 
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-1">
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
               Estimated Value ($)
             </label>
             <input
@@ -322,12 +322,12 @@ export const CreateListingWizard: React.FC<CreateListingWizardProps> = ({
               value={estimatedValue}
               onChange={(e) => setEstimatedValue(Number(e.target.value))}
               placeholder="100"
-              className="w-full px-4 py-3 rounded-xl bg-neutral-950 border border-neutral-800 text-neutral-100 focus:outline-hidden focus:border-amber-500 text-sm font-mono"
+              className="w-full px-4 py-3 rounded-2xl bg-[#05060B] border border-white/10 text-white focus:outline-hidden focus:border-orange-500 text-sm font-mono"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-1">
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
               Description & Special Instructions
             </label>
             <textarea
@@ -336,7 +336,7 @@ export const CreateListingWizard: React.FC<CreateListingWizardProps> = ({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Include size dimensions, disassembly status, stairs/loading dock details..."
-              className="w-full px-4 py-3 rounded-xl bg-neutral-950 border border-neutral-800 text-neutral-100 placeholder-neutral-500 focus:outline-hidden focus:border-amber-500 text-sm"
+              className="w-full px-4 py-3 rounded-2xl bg-[#05060B] border border-white/10 text-white placeholder-slate-500 focus:outline-hidden focus:border-orange-500 text-sm"
             />
           </div>
         </div>
@@ -346,7 +346,7 @@ export const CreateListingWizard: React.FC<CreateListingWizardProps> = ({
       {step === 3 && (
         <div className="space-y-4">
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-1">
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
               Exact Pickup Address *
             </label>
             <input
@@ -355,16 +355,16 @@ export const CreateListingWizard: React.FC<CreateListingWizardProps> = ({
               value={pickupAddress}
               onChange={(e) => setPickupAddress(e.target.value)}
               placeholder="123 Market St, Loading Dock B, City, State"
-              className="w-full px-4 py-3 rounded-xl bg-neutral-950 border border-neutral-800 text-neutral-100 focus:outline-hidden focus:border-amber-500 text-sm"
+              className="w-full px-4 py-3 rounded-2xl bg-[#05060B] border border-white/10 text-white focus:outline-hidden focus:border-orange-500 text-sm"
             />
-            <p className="mt-1.5 text-[11px] text-neutral-400 flex items-center gap-1">
-              <Info className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+            <p className="mt-2 text-xs text-slate-400 flex items-center gap-1.5">
+              <Info className="w-4 h-4 text-orange-400 shrink-0" />
               <span>Exact address is kept strictly private and only revealed to a confirmed buyer upon claim.</span>
             </p>
           </div>
 
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-1">
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
               Available From
             </label>
             <input
@@ -372,19 +372,19 @@ export const CreateListingWizard: React.FC<CreateListingWizardProps> = ({
               type="datetime-local"
               value={availableFrom}
               onChange={(e) => setAvailableFrom(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl bg-neutral-950 border border-neutral-800 text-neutral-100 focus:outline-hidden focus:border-amber-500 text-sm font-mono"
+              className="w-full px-4 py-3 rounded-2xl bg-[#05060B] border border-white/10 text-white focus:outline-hidden focus:border-orange-500 text-sm font-mono"
             />
           </div>
 
-          <div className="p-4 rounded-2xl bg-neutral-950 border border-neutral-800 flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 shrink-0">
+          <div className="p-4 rounded-2xl bg-[#05060B] border border-white/5 flex items-center gap-3.5">
+            <div className="p-3 rounded-2xl bg-green-500/15 text-green-400 border border-green-500/30 shrink-0">
               <Clock className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="text-xs font-bold text-neutral-200">
+              <h4 className="text-xs font-black text-white">
                 Disposal Deadline Auto-Calculated
               </h4>
-              <p className="text-[11px] text-neutral-400">
+              <p className="text-xs text-slate-400 mt-0.5">
                 Your total deadline ({totalScheduleHours} hours) is automatically linked to the pricing schedule set in the next step.
               </p>
             </div>
@@ -397,21 +397,21 @@ export const CreateListingWizard: React.FC<CreateListingWizardProps> = ({
         <div className="space-y-5">
           {/* Preset Buttons */}
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2">
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
               Select Quick Schedule Preset
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
               <button
                 type="button"
                 onClick={() => handlePresetSelect('free_escalation')}
-                className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
+                className={`p-4 rounded-2xl border text-left transition-all cursor-pointer ${
                   presetType === 'free_escalation'
-                    ? 'bg-amber-500/15 border-amber-500 text-amber-200 shadow-sm'
-                    : 'bg-neutral-950 border-neutral-800 text-neutral-300 hover:bg-neutral-800'
+                    ? 'bg-orange-500/20 border-orange-500 text-orange-200 shadow-[0_0_15px_rgba(249,115,22,0.2)]'
+                    : 'bg-[#05060B] border-white/5 text-slate-300 hover:bg-white/5'
                 }`}
               >
-                <div className="font-bold text-xs">Free-to-Paid Escalation</div>
-                <div className="text-[10px] text-neutral-400 mt-1">
+                <div className="font-black text-xs text-white">Free-to-Paid Escalation</div>
+                <div className="text-[11px] text-slate-400 mt-1">
                   FREE 30m → $30 (2h) → $75 (2h) → $150
                 </div>
               </button>
@@ -419,14 +419,14 @@ export const CreateListingWizard: React.FC<CreateListingWizardProps> = ({
               <button
                 type="button"
                 onClick={() => handlePresetSelect('quick_removal')}
-                className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
+                className={`p-4 rounded-2xl border text-left transition-all cursor-pointer ${
                   presetType === 'quick_removal'
-                    ? 'bg-amber-500/15 border-amber-500 text-amber-200 shadow-sm'
-                    : 'bg-neutral-950 border-neutral-800 text-neutral-300 hover:bg-neutral-800'
+                    ? 'bg-orange-500/20 border-orange-500 text-orange-200 shadow-[0_0_15px_rgba(249,115,22,0.2)]'
+                    : 'bg-[#05060B] border-white/5 text-slate-300 hover:bg-white/5'
                 }`}
               >
-                <div className="font-bold text-xs">Quick Removal Step-Up</div>
-                <div className="text-[10px] text-neutral-400 mt-1">
+                <div className="font-black text-xs text-white">Quick Removal Step-Up</div>
+                <div className="text-[11px] text-slate-400 mt-1">
                   $20 (1h) → $50 (2h) → $100 final
                 </div>
               </button>
@@ -434,14 +434,14 @@ export const CreateListingWizard: React.FC<CreateListingWizardProps> = ({
               <button
                 type="button"
                 onClick={() => handlePresetSelect('flat_urgent')}
-                className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
+                className={`p-4 rounded-2xl border text-left transition-all cursor-pointer ${
                   presetType === 'flat_urgent'
-                    ? 'bg-amber-500/15 border-amber-500 text-amber-200 shadow-sm'
-                    : 'bg-neutral-950 border-neutral-800 text-neutral-300 hover:bg-neutral-800'
+                    ? 'bg-orange-500/20 border-orange-500 text-orange-200 shadow-[0_0_15px_rgba(249,115,22,0.2)]'
+                    : 'bg-[#05060B] border-white/5 text-slate-300 hover:bg-white/5'
                 }`}
               >
-                <div className="font-bold text-xs">100% Free Quick Grab</div>
-                <div className="text-[10px] text-neutral-400 mt-1">
+                <div className="font-black text-xs text-white">100% Free Quick Grab</div>
+                <div className="text-[11px] text-slate-400 mt-1">
                   FREE for all 6 hours until deadline
                 </div>
               </button>
@@ -451,13 +451,13 @@ export const CreateListingWizard: React.FC<CreateListingWizardProps> = ({
           {/* Windows Editor */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-neutral-400">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
                 Custom Stage Windows
               </span>
               <button
                 type="button"
                 onClick={addPricingWindow}
-                className="flex items-center gap-1 text-xs font-bold text-amber-400 hover:text-amber-300 cursor-pointer"
+                className="flex items-center gap-1.5 text-xs font-black text-orange-400 hover:text-orange-300 cursor-pointer bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-xl border border-white/5 transition-colors"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Add Window</span>
@@ -468,32 +468,32 @@ export const CreateListingWizard: React.FC<CreateListingWizardProps> = ({
               {pricingWindows.map((w, index) => (
                 <div
                   key={index}
-                  className="flex items-center gap-3 p-3 rounded-xl bg-neutral-950 border border-neutral-800"
+                  className="flex items-center gap-3 p-3.5 rounded-2xl bg-[#05060B] border border-white/5"
                 >
-                  <span className="text-xs font-mono font-bold text-neutral-400 w-16">
+                  <span className="text-xs font-mono font-bold text-orange-400 w-16">
                     Stage {index + 1}
                   </span>
 
                   <div className="flex-1 flex items-center gap-2">
-                    <span className="text-xs text-neutral-400">For</span>
+                    <span className="text-xs text-slate-400">For</span>
                     <input
                       type="number"
                       min={10}
                       step={15}
                       value={w.durationMinutes}
                       onChange={(e) => updatePricingWindow(index, 'durationMinutes', Number(e.target.value))}
-                      className="w-20 px-2.5 py-1.5 rounded-lg bg-neutral-900 border border-neutral-700 text-xs font-mono text-neutral-100"
+                      className="w-20 px-3 py-1.5 rounded-xl bg-[#0A0C14] border border-white/10 text-xs font-mono text-white"
                     />
-                    <span className="text-xs text-neutral-400">mins @</span>
+                    <span className="text-xs text-slate-400">mins @</span>
 
-                    <span className="text-xs text-neutral-400">$</span>
+                    <span className="text-xs text-slate-400">$</span>
                     <input
                       type="number"
                       min={0}
                       step={5}
                       value={w.price}
                       onChange={(e) => updatePricingWindow(index, 'price', Number(e.target.value))}
-                      className="w-24 px-2.5 py-1.5 rounded-lg bg-neutral-900 border border-neutral-700 text-xs font-mono text-neutral-100 font-bold"
+                      className="w-24 px-3 py-1.5 rounded-xl bg-[#0A0C14] border border-white/10 text-xs font-mono text-white font-bold"
                     />
                   </div>
 
@@ -501,7 +501,7 @@ export const CreateListingWizard: React.FC<CreateListingWizardProps> = ({
                     <button
                       type="button"
                       onClick={() => removePricingWindow(index)}
-                      className="p-1.5 text-neutral-500 hover:text-rose-400 transition-colors cursor-pointer"
+                      className="p-2 text-slate-500 hover:text-red-400 transition-colors cursor-pointer rounded-xl hover:bg-red-500/10"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -516,42 +516,42 @@ export const CreateListingWizard: React.FC<CreateListingWizardProps> = ({
       {/* STEP 5: REVIEW & PUBLISH */}
       {step === 5 && (
         <div className="space-y-4">
-          <div className="p-4 rounded-2xl bg-neutral-950 border border-neutral-800 space-y-3">
+          <div className="p-5 rounded-3xl bg-[#05060B] border border-white/5 space-y-3 shadow-inner">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <span className="text-[10px] font-mono uppercase tracking-wider text-amber-400">
+                <span className="text-[10px] font-mono uppercase tracking-wider text-orange-400 font-bold">
                   Ready to Publish
                 </span>
-                <h3 className="text-lg font-bold text-neutral-100">{title || 'Untitled Item'}</h3>
-                <p className="text-xs text-neutral-400 line-clamp-2 mt-0.5">{description}</p>
+                <h3 className="text-lg font-black text-white">{title || 'Untitled Item'}</h3>
+                <p className="text-xs text-slate-400 line-clamp-2 mt-0.5">{description}</p>
               </div>
 
-              <div className="px-3 py-1 rounded-lg text-lg font-mono font-bold bg-amber-500 text-neutral-950 shrink-0">
+              <div className="px-3.5 py-1.5 rounded-2xl text-lg font-mono font-black bg-orange-500 text-white shadow-[0_0_15px_rgba(249,115,22,0.4)] shrink-0">
                 {formatPrice(pricingWindows[0]?.price || 0)}
               </div>
             </div>
 
-            <div className="pt-2 border-t border-neutral-800/80 grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs text-neutral-300">
+            <div className="pt-3 border-t border-white/5 grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs text-slate-300">
               <div>
-                <span className="text-neutral-500 block text-[10px]">Condition</span>
-                <span className="capitalize">{condition.replace('_', ' ')}</span>
+                <span className="text-slate-500 block text-[10px] uppercase font-bold">Condition</span>
+                <span className="capitalize font-medium text-white">{condition.replace('_', ' ')}</span>
               </div>
               <div>
-                <span className="text-neutral-500 block text-[10px]">Total Windows</span>
-                <span>{pricingWindows.length} stages ({totalScheduleHours}h total)</span>
+                <span className="text-slate-500 block text-[10px] uppercase font-bold">Total Windows</span>
+                <span className="font-medium text-white">{pricingWindows.length} stages ({totalScheduleHours}h total)</span>
               </div>
               <div>
-                <span className="text-neutral-500 block text-[10px]">Initial Price</span>
-                <span className="font-bold text-emerald-400">{formatPrice(pricingWindows[0]?.price || 0)}</span>
+                <span className="text-slate-500 block text-[10px] uppercase font-bold">Initial Price</span>
+                <span className="font-bold text-green-400">{formatPrice(pricingWindows[0]?.price || 0)}</span>
               </div>
             </div>
           </div>
 
-          <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-xs text-emerald-300 flex items-start gap-2.5">
-            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400 mt-0.5" />
+          <div className="p-4 rounded-2xl bg-green-500/10 border border-green-500/30 text-xs text-green-300 flex items-start gap-3">
+            <CheckCircle2 className="w-5 h-5 shrink-0 text-green-400 mt-0.5" />
             <div>
-              <span className="font-bold">Nearby Matching Alert</span>
-              <p className="mt-0.5 text-neutral-300">
+              <span className="font-bold block">Nearby Matching Alert</span>
+              <p className="mt-0.5 text-slate-300 leading-relaxed">
                 Upon publishing, buyers who have registered interest alerts for this category within your radius will be matched.
               </p>
             </div>
@@ -560,12 +560,12 @@ export const CreateListingWizard: React.FC<CreateListingWizardProps> = ({
       )}
 
       {/* Navigation Buttons */}
-      <div className="flex items-center justify-between border-t border-neutral-800 pt-4">
+      <div className="flex items-center justify-between border-t border-white/5 pt-4">
         {step > 1 ? (
           <button
             type="button"
             onClick={() => setStep((s) => s - 1)}
-            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-semibold text-neutral-300 hover:bg-neutral-800 transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 px-4 py-2.5 rounded-2xl text-xs font-bold text-slate-300 hover:bg-white/5 transition-colors cursor-pointer border border-white/5"
           >
             <ChevronLeft className="w-4 h-4" />
             <span>Back</span>
@@ -578,7 +578,7 @@ export const CreateListingWizard: React.FC<CreateListingWizardProps> = ({
           <button
             type="button"
             onClick={() => setStep((s) => s + 1)}
-            className="flex items-center gap-1.5 px-6 py-2.5 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 text-neutral-950 transition-colors cursor-pointer shadow-md shadow-amber-500/20"
+            className="flex items-center gap-1.5 px-6 py-3 rounded-2xl text-xs font-black bg-orange-500 hover:bg-orange-400 text-white transition-all cursor-pointer shadow-[0_0_20px_rgba(249,115,22,0.4)] hover:scale-[1.02]"
           >
             <span>Next</span>
             <ChevronRight className="w-4 h-4" />
@@ -589,7 +589,7 @@ export const CreateListingWizard: React.FC<CreateListingWizardProps> = ({
             id="publish-listing-btn"
             onClick={handleSubmit}
             disabled={isSubmitting}
-            className="flex items-center gap-2 px-8 py-3 rounded-xl text-sm font-extrabold bg-amber-500 hover:bg-amber-400 text-neutral-950 transition-colors cursor-pointer shadow-lg shadow-amber-500/20 disabled:opacity-50"
+            className="flex items-center gap-2 px-8 py-3.5 rounded-2xl text-sm font-black bg-orange-500 hover:bg-orange-400 text-white transition-all cursor-pointer shadow-[0_0_25px_rgba(249,115,22,0.5)] hover:scale-[1.02] disabled:opacity-50"
           >
             {isSubmitting ? (
               <span>Publishing...</span>

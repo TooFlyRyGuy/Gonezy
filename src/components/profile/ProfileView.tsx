@@ -60,7 +60,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenSupabaseModal })
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       {/* Profile Overview Card */}
-      <div className="p-6 rounded-3xl bg-neutral-900 border border-neutral-800 space-y-4 shadow-xl">
+      <div className="p-6 rounded-3xl bg-[#0A0C14] border border-white/5 space-y-5 shadow-xl">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3.5">
             {profile?.avatar_url ? (
@@ -68,23 +68,23 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenSupabaseModal })
                 src={profile.avatar_url}
                 alt="Avatar"
                 referrerPolicy="no-referrer"
-                className="w-14 h-14 rounded-full object-cover border border-neutral-700 shadow-sm"
+                className="w-14 h-14 rounded-2xl object-cover border border-white/10 shadow-sm"
               />
             ) : (
-              <div className="w-14 h-14 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center text-lg font-bold">
+              <div className="w-14 h-14 rounded-2xl bg-orange-500/15 border border-orange-500/30 text-orange-400 flex items-center justify-center text-lg font-black shadow-[0_0_15px_rgba(249,115,22,0.2)]">
                 {(profile?.display_name || user?.email || 'U').charAt(0).toUpperCase()}
               </div>
             )}
             <div>
-              <div className="flex items-center gap-1.5">
-                <h2 className="text-lg font-bold text-neutral-100">
+              <div className="flex items-center gap-2">
+                <h2 className="text-lg font-black text-white">
                   {profile?.display_name || user?.email?.split('@')[0] || 'Member Profile'}
                 </h2>
                 {profile?.is_verified && (
-                  <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                  <ShieldCheck className="w-4 h-4 text-green-400" />
                 )}
               </div>
-              <span className="text-xs text-neutral-400 font-mono">
+              <span className="text-xs text-slate-400 font-mono">
                 {user?.email || 'Authenticated User'}
               </span>
             </div>
@@ -92,7 +92,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenSupabaseModal })
 
           <button
             onClick={() => signOut()}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold text-rose-400 hover:bg-rose-500/10 border border-rose-500/20 transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-2xl text-xs font-bold text-red-400 hover:bg-red-500/10 border border-red-500/20 transition-colors cursor-pointer"
           >
             <LogOut className="w-3.5 h-3.5" />
             <span>Sign Out</span>
@@ -100,22 +100,22 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenSupabaseModal })
         </div>
 
         {/* Demo Switcher Pill */}
-        <div className="p-3 rounded-2xl bg-neutral-950 border border-neutral-800 flex items-center justify-between gap-2">
-          <div className="text-xs text-neutral-400">
-            <span className="font-bold text-neutral-300">Quick Testing Persona:</span>
-            <span className="ml-1">Simulate either Buyer or Commercial Seller flow</span>
+        <div className="p-3.5 rounded-2xl bg-[#05060B] border border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="text-xs text-slate-400">
+            <span className="font-black text-slate-200">Quick Testing Persona:</span>
+            <span className="ml-1">Switch between Buyer or Commercial Seller</span>
           </div>
 
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-2">
             <button
               onClick={() => setDemoUser('buyer')}
-              className="px-2.5 py-1 rounded-lg text-xs font-bold bg-neutral-800 hover:bg-neutral-700 text-neutral-200 transition-colors cursor-pointer"
+              className="px-3.5 py-1.5 rounded-xl text-xs font-black bg-white/5 hover:bg-white/10 text-slate-200 border border-white/5 transition-colors cursor-pointer"
             >
               Buyer Persona
             </button>
             <button
               onClick={() => setDemoUser('seller')}
-              className="px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 transition-colors cursor-pointer"
+              className="px-3.5 py-1.5 rounded-xl text-xs font-black bg-orange-500/20 hover:bg-orange-500/30 text-orange-300 border border-orange-500/40 transition-colors cursor-pointer shadow-[0_0_10px_rgba(249,115,22,0.2)]"
             >
               Seller (Mover)
             </button>
@@ -124,59 +124,59 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenSupabaseModal })
       </div>
 
       {/* Database Setup Callout */}
-      <div className="p-5 rounded-3xl bg-neutral-900 border border-neutral-800 flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className={`p-2.5 rounded-xl ${isSupabaseConfigured ? 'bg-emerald-500/15 text-emerald-400' : 'bg-amber-500/15 text-amber-400'}`}>
+      <div className="p-6 rounded-3xl bg-[#0A0C14] border border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xl">
+        <div className="flex items-center gap-3.5">
+          <div className={`p-3 rounded-2xl ${isSupabaseConfigured ? 'bg-green-500/15 text-green-400 border border-green-500/30' : 'bg-orange-500/15 text-orange-400 border border-orange-500/30 shadow-[0_0_15px_rgba(249,115,22,0.2)]'}`}>
             <Database className="w-5 h-5" />
           </div>
           <div>
-            <h4 className="text-xs font-bold text-neutral-200">
+            <h4 className="text-sm font-black text-white">
               Supabase Backend Status: {isSupabaseConfigured ? 'Connected' : 'Setup Ready'}
             </h4>
-            <p className="text-[11px] text-neutral-400">
+            <p className="text-xs text-slate-400 mt-0.5">
               {isSupabaseConfigured 
                 ? 'Production PostgreSQL database and RLS policies active.'
-                : 'Configure your environment variables and execute SQL migrations in 1 click.'}
+                : 'Configure your environment variables and execute SQL migrations.'}
             </p>
           </div>
         </div>
 
         <button
           onClick={onOpenSupabaseModal}
-          className="px-3.5 py-2 rounded-xl text-xs font-bold bg-neutral-800 hover:bg-neutral-700 text-neutral-200 shrink-0 cursor-pointer border border-neutral-700"
+          className="px-4 py-2.5 rounded-2xl text-xs font-black bg-white/5 hover:bg-white/10 text-white shrink-0 cursor-pointer border border-white/10 transition-colors"
         >
           View Migrations
         </button>
       </div>
 
       {/* Profile Form */}
-      <form onSubmit={handleSave} className="p-6 rounded-3xl bg-neutral-900 border border-neutral-800 space-y-5">
-        <h3 className="text-sm font-bold uppercase tracking-wider text-neutral-400 border-b border-neutral-800 pb-3">
+      <form onSubmit={handleSave} className="p-6 rounded-3xl bg-[#0A0C14] border border-white/5 space-y-5 shadow-xl">
+        <h3 className="text-xs font-black uppercase tracking-wider text-slate-400 border-b border-white/5 pb-3">
           Edit Profile Information
         </h3>
 
         {saveSuccess && (
-          <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-xs text-emerald-300 flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+          <div className="p-3.5 rounded-2xl bg-green-500/10 border border-green-500/30 text-xs text-green-300 flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-green-400 shrink-0" />
             <span>Profile updated successfully!</span>
           </div>
         )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-1">
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
               Display Name
             </label>
             <input
               type="text"
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-sm text-neutral-100 focus:outline-hidden focus:border-amber-500"
+              className="w-full px-4 py-3 rounded-2xl bg-[#05060B] border border-white/10 text-sm text-white focus:outline-hidden focus:border-orange-500"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-1">
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
               Phone Number (For Pickups)
             </label>
             <input
@@ -184,51 +184,51 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenSupabaseModal })
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="(555) 000-0000"
-              className="w-full px-3.5 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-sm font-mono text-neutral-100 focus:outline-hidden focus:border-amber-500"
+              className="w-full px-4 py-3 rounded-2xl bg-[#05060B] border border-white/10 text-sm font-mono text-white focus:outline-hidden focus:border-orange-500"
             />
           </div>
         </div>
 
         {/* Account Type Toggle */}
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-2">
+          <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
             Account Type
           </label>
           <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
               onClick={() => setAccountType('consumer')}
-              className={`p-3 rounded-xl border text-left cursor-pointer transition-all ${
+              className={`p-4 rounded-2xl border text-left cursor-pointer transition-all ${
                 accountType === 'consumer'
-                  ? 'bg-amber-500/15 border-amber-500 text-amber-200'
-                  : 'bg-neutral-950 border-neutral-800 text-neutral-400'
+                  ? 'bg-orange-500/15 border-orange-500 text-orange-200 shadow-[0_0_15px_rgba(249,115,22,0.2)]'
+                  : 'bg-[#05060B] border-white/5 text-slate-400'
               }`}
             >
-              <User className="w-4 h-4 mb-1" />
-              <div className="font-bold text-xs">Individual Consumer</div>
-              <div className="text-[10px] text-neutral-400">Buying or occasional selling</div>
+              <User className="w-4 h-4 mb-1.5 text-orange-400" />
+              <div className="font-bold text-xs text-white">Individual Consumer</div>
+              <div className="text-[10px] text-slate-400 mt-0.5">Buying or occasional selling</div>
             </button>
 
             <button
               type="button"
               onClick={() => setAccountType('business')}
-              className={`p-3 rounded-xl border text-left cursor-pointer transition-all ${
+              className={`p-4 rounded-2xl border text-left cursor-pointer transition-all ${
                 accountType === 'business'
-                  ? 'bg-amber-500/15 border-amber-500 text-amber-200'
-                  : 'bg-neutral-950 border-neutral-800 text-neutral-400'
+                  ? 'bg-orange-500/15 border-orange-500 text-orange-200 shadow-[0_0_15px_rgba(249,115,22,0.2)]'
+                  : 'bg-[#05060B] border-white/5 text-slate-400'
               }`}
             >
-              <Building2 className="w-4 h-4 mb-1" />
-              <div className="font-bold text-xs">Business / Pro Hauler</div>
-              <div className="text-[10px] text-neutral-400">Junk haulers, movers, contractors</div>
+              <Building2 className="w-4 h-4 mb-1.5 text-orange-400" />
+              <div className="font-bold text-xs text-white">Business / Pro Hauler</div>
+              <div className="text-[10px] text-slate-400 mt-0.5">Junk haulers, movers, contractors</div>
             </button>
           </div>
         </div>
 
         {accountType === 'business' && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-2xl bg-neutral-950 border border-neutral-800">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-5 rounded-2xl bg-[#05060B] border border-white/5">
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-1">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
                 Business Name
               </label>
               <input
@@ -236,18 +236,18 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenSupabaseModal })
                 value={businessName}
                 onChange={(e) => setBusinessName(e.target.value)}
                 placeholder="e.g. Apex Hauling & Demolition"
-                className="w-full px-3.5 py-2 rounded-xl bg-neutral-900 border border-neutral-800 text-sm text-neutral-100 focus:outline-hidden focus:border-amber-500"
+                className="w-full px-4 py-2.5 rounded-xl bg-[#0A0C14] border border-white/10 text-sm text-white focus:outline-hidden focus:border-orange-500"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-1">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
                 Business Category
               </label>
               <select
                 value={businessType}
                 onChange={(e) => setBusinessType(e.target.value as BusinessType)}
-                className="w-full px-3.5 py-2 rounded-xl bg-neutral-900 border border-neutral-800 text-sm text-neutral-100 focus:outline-hidden focus:border-amber-500"
+                className="w-full px-4 py-2.5 rounded-xl bg-[#0A0C14] border border-white/10 text-sm text-white focus:outline-hidden focus:border-orange-500 cursor-pointer"
               >
                 <option value="junk_hauler">Junk Hauler</option>
                 <option value="mover">Mover / Relocation</option>
@@ -265,7 +265,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenSupabaseModal })
         )}
 
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-1">
+          <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
             Bio / Public Notes
           </label>
           <textarea
@@ -273,14 +273,17 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenSupabaseModal })
             value={bio}
             onChange={(e) => setBio(e.target.value)}
             placeholder="Introduce your business or pickup truck capabilities..."
-            className="w-full px-3.5 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-sm text-neutral-100 focus:outline-hidden focus:border-amber-500"
+            className="w-full px-4 py-3 rounded-2xl bg-[#05060B] border border-white/10 text-sm text-white focus:outline-hidden focus:border-orange-500"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-1">
-            Default Search Radius: {searchRadius} Miles
-          </label>
+          <div className="flex justify-between items-center mb-1.5">
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-400">
+              Default Search Radius
+            </label>
+            <span className="text-xs font-mono font-bold text-orange-400">{searchRadius} Miles</span>
+          </div>
           <input
             type="range"
             min={5}
@@ -288,7 +291,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenSupabaseModal })
             step={5}
             value={searchRadius}
             onChange={(e) => setSearchRadius(Number(e.target.value))}
-            className="w-full accent-amber-500"
+            className="w-full accent-orange-500"
           />
         </div>
 
@@ -296,7 +299,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenSupabaseModal })
           <button
             type="submit"
             disabled={isSaving}
-            className="px-6 py-2.5 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 text-neutral-950 transition-colors cursor-pointer disabled:opacity-50 shadow-md shadow-amber-500/20"
+            className="px-6 py-3 rounded-2xl text-xs font-black bg-orange-500 hover:bg-orange-400 text-white transition-all cursor-pointer disabled:opacity-50 shadow-[0_0_20px_rgba(249,115,22,0.4)] hover:scale-[1.02]"
           >
             {isSaving ? 'Saving Changes...' : 'Save Profile Changes'}
           </button>

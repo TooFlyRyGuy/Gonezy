@@ -1,4 +1,4 @@
-import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { supabase, isSupabaseLive, disableSupabaseLiveMode, isSupabaseAuthOrKeyError } from '../lib/supabase';
 import { AccountType } from '../types/database.types';
 
 export interface SignUpParams {
@@ -13,51 +13,81 @@ export interface SignUpParams {
 
 export const authService = {
   async signUp({ email, password, displayName, accountType = 'consumer', firstName, lastName, businessName }: SignUpParams) {
-    if (!isSupabaseConfigured) {
-      throw new Error('Supabase is not configured. Please add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your environment.');
+    if (!isSupabaseLive()) {
+      throw new Error('Supabase live auth requires active database credentials.');
     }
 
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          display_name: displayName,
-          first_name: firstName || '',
-          last_name: lastName || '',
-          account_type: accountType,
-          business_name: businessName || '',
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            display_name: displayName,
+            first_name: firstName || '',
+            last_name: lastName || '',
+            account_type: accountType,
+            business_name: businessName || '',
+          },
         },
-      },
-    });
+      });
 
-    if (error) throw error;
-    return data;
+      if (error) {
+        if (isSupabaseAuthOrKeyError(error)) {
+          disableSupabaseLiveMode('Authentication required');
+        }
+        throw error;
+      }
+      return data;
+    } catch (err: any) {
+      if (isSupabaseAuthOrKeyError(err)) {
+        disableSupabaseLiveMode('Authentication required');
+      }
+      throw err;
+    }
   },
 
   async signIn(email: string, password: string) {
-    if (!isSupabaseConfigured) {
-      throw new Error('Supabase is not configured. Please add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.');
+    if (!isSupabaseLive()) {
+      throw new Error('Supabase live auth requires active database credentials.');
     }
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    if (error) throw error;
-    return data;
+      if (error) {
+        if (isSupabaseAuthOrKeyError(error)) {
+          disableSupabaseLiveMode('Authentication required');
+        }
+        throw error;
+      }
+      return data;
+    } catch (err: any) {
+      if (isSupabaseAuthOrKeyError(err)) {
+        disableSupabaseLiveMode('Authentication required');
+      }
+      throw err;
+    }
   },
 
   async signOut() {
-    if (!isSupabaseConfigured) return;
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
+    if (!isSupabaseLive()) return;
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error && !isSupabaseAuthOrKeyError(error)) throw error;
+    } catch (err: any) {
+      if (isSupabaseAuthOrKeyError(err)) {
+        disableSupabaseLiveMode('Authentication required');
+      }
+    }
   },
 
   async resetPassword(email: string) {
-    if (!isSupabaseConfigured) {
-      throw new Error('Supabase is not configured.');
+    if (!isSupabaseLive()) {
+      throw new Error('Supabase live auth requires active database credentials.');
     }
     const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/reset-password`,
@@ -67,21 +97,52 @@ export const authService = {
   },
 
   async getSession() {
-    if (!isSupabaseConfigured) return null;
-    const { data } = await supabase.auth.getSession();
-    return data.session;
+    if (!isSupabaseLive()) return null;
+    try {
+      const { data, error } = await supabase.auth.getSession();
+      if (error) {
+        if (isSupabaseAuthOrKeyError(error)) {
+          disableSupabaseLiveMode('Authentication required');
+        }
+        return null;
+      }
+      return data.session;
+    } catch (err: any) {
+      if (isSupabaseAuthOrKeyError(err)) {
+        disableSupabaseLiveMode('Authentication required');
+      }
+      return null;
+    }
   },
 
   async getCurrentUser() {
-    if (!isSupabaseConfigured) return null;
-    const { data } = await supabase.auth.getUser();
-    return data.user;
+    if (!isSupabaseLive()) return null;
+    try {
+      const { data, error } = await supabase.auth.getUser();
+      if (error) {
+        if (isSupabaseAuthOrKeyError(error)) {
+          disableSupabaseLiveMode('Authentication required');
+        }
+        return null;
+      }
+      return data.user;
+    } catch (err: any) {
+      if (isSupabaseAuthOrKeyError(err)) {
+        disableSupabaseLiveMode('Authentication required');
+      }
+      return null;
+    }
   },
 
   onAuthStateChange(callback: (event: string, session: any) => void) {
-    if (!isSupabaseConfigured) {
+    if (!isSupabaseLive()) {
       return { data: { subscription: { unsubscribe: () => {} } } };
     }
-    return supabase.auth.onAuthStateChange(callback);
+    try {
+      return supabase.auth.onAuthStateChange(callback);
+    } catch {
+      return { data: { subscription: { unsubscribe: () => {} } } };
+    }
   },
 };
+

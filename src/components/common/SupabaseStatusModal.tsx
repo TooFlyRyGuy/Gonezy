@@ -25,39 +25,26 @@ export const SupabaseStatusModal: React.FC<SupabaseStatusModalProps> = ({
 
   if (!isOpen) return null;
 
-  const sqlMigrationSummary = `-- NabGo Schema Migration (All Tables, Functions, RLS)
--- 1. Profiles & Categories
-CREATE TABLE IF NOT EXISTS public.profiles (
-  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-  display_name TEXT,
-  phone TEXT,
-  account_type TEXT DEFAULT 'consumer',
-  business_name TEXT,
-  business_type TEXT,
-  created_at TIMESTAMPTZ DEFAULT now()
-);
+  const sqlMigrationSummary = `-- Gonezy Complete Schema Migration
+-- Applied via /supabase/migrations/20260902000001_initial_schema.sql
+-- Run in Supabase SQL Editor or via supabase db push
 
--- 2. Listings with escalating price windows & location privacy
-CREATE TABLE IF NOT EXISTS public.listings (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  seller_id UUID NOT NULL REFERENCES public.profiles(id),
-  title TEXT NOT NULL,
-  pickup_deadline TIMESTAMPTZ NOT NULL,
-  pickup_address_text TEXT NOT NULL,
-  pickup_latitude NUMERIC NOT NULL,
-  pickup_longitude NUMERIC NOT NULL,
-  approximate_public_latitude NUMERIC NOT NULL,
-  approximate_public_longitude NUMERIC NOT NULL,
-  status TEXT DEFAULT 'active'
-);
-
--- 3. Atomic Function for Locking Claims
-CREATE OR REPLACE FUNCTION public.claim_listing(
-  p_listing_id UUID,
-  p_buyer_id UUID
-) RETURNS JSONB AS $$
-  -- Enforces atomic lock with SELECT FOR UPDATE
-$$ LANGUAGE plpgsql SECURITY DEFINER;`;
+-- 1. Profiles & Automatic User Trigger
+-- 2. Categories (15 Seeded Categories)
+-- 3. Listings (Privacy-Safe Geo, Urgency Deadlines)
+-- 4. Listing Images & Storage Bucket ('listing-images')
+-- 5. Listing Price Windows (Dynamic Urgency Pricing)
+-- 6. Buyer Interests / Wanted List (Strict Private RLS)
+-- 7. Claims (Partial Unique Index for Concurrency)
+-- 8. Notifications (In-app, Price & Claim alerts)
+-- 9. Atomic Functions:
+--    - claim_listing(p_listing_id, p_buyer_id)
+--    - complete_pickup(p_claim_id, p_user_id)
+--    - cancel_claim(p_claim_id, p_user_id, p_reason)
+--    - get_current_listing_price(p_listing_id, p_at)
+--    - expire_overdue_listings()
+-- 10. Privacy View: public.public_listings
+-- 11. Row Level Security on ALL tables`;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(sqlMigrationSummary);
@@ -67,23 +54,23 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;`;
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4"
       onClick={onClose}
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-2xl bg-neutral-900 border border-neutral-800 rounded-3xl p-6 sm:p-8 space-y-5 shadow-2xl text-neutral-100 max-h-[90vh] flex flex-col"
+        className="w-full max-w-2xl bg-[#0A0C14] border border-white/10 rounded-3xl p-6 sm:p-8 space-y-5 shadow-2xl text-slate-100 max-h-[90vh] flex flex-col"
       >
-        <div className="flex items-center justify-between border-b border-neutral-800 pb-4">
-          <div className="flex items-center gap-2.5">
-            <div className={`p-2.5 rounded-xl ${isSupabaseConfigured ? 'bg-emerald-500/15 text-emerald-400' : 'bg-amber-500/15 text-amber-400'}`}>
+        <div className="flex items-center justify-between border-b border-white/5 pb-4">
+          <div className="flex items-center gap-3">
+            <div className={`p-3 rounded-2xl ${isSupabaseConfigured ? 'bg-green-500/15 text-green-400 border border-green-500/30' : 'bg-orange-500/15 text-orange-400 border border-orange-500/30 shadow-[0_0_15px_rgba(249,115,22,0.2)]'}`}>
               <Database className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-neutral-100">
+              <h2 className="text-lg font-black text-white">
                 Supabase Architecture & Database Status
               </h2>
-              <span className="text-xs text-neutral-400 font-mono">
+              <span className="text-xs text-slate-400 font-mono">
                 {isSupabaseConfigured ? 'Connected to live Supabase backend' : 'Running in Zero-Latency Demo Mode'}
               </span>
             </div>
@@ -91,7 +78,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;`;
 
           <button
             onClick={onClose}
-            className="p-1.5 rounded-full bg-neutral-800 text-neutral-400 hover:text-neutral-200 cursor-pointer"
+            className="p-2 rounded-full bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -101,19 +88,19 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;`;
           {/* Status Banner */}
           <div className={`p-4 rounded-2xl border flex items-start gap-3 ${
             isSupabaseConfigured
-              ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
-              : 'bg-amber-500/10 border-amber-500/30 text-amber-300'
+              ? 'bg-green-500/10 border-green-500/30 text-green-300'
+              : 'bg-orange-500/10 border-orange-500/30 text-orange-300'
           }`}>
             {isSupabaseConfigured ? (
-              <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+              <CheckCircle2 className="w-5 h-5 text-green-400 shrink-0 mt-0.5" />
             ) : (
-              <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+              <AlertTriangle className="w-5 h-5 text-orange-400 shrink-0 mt-0.5" />
             )}
             <div className="text-xs space-y-1">
               <span className="font-bold block">
                 {isSupabaseConfigured ? 'Supabase Credentials Detected' : 'Full Local Service Layer Active'}
               </span>
-              <p className="text-neutral-300 leading-relaxed">
+              <p className="text-slate-300 leading-relaxed">
                 {isSupabaseConfigured
                   ? 'All listings, escalating price schedules, and user claims are synchronized directly with your PostgreSQL database.'
                   : 'To link your personal Supabase project, supply VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your environment, then run the SQL migration.'}
@@ -124,42 +111,42 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;`;
           {/* Migration file info */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-neutral-400 flex items-center gap-1.5">
-                <Code2 className="w-4 h-4 text-amber-400" />
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                <Code2 className="w-4 h-4 text-orange-400" />
                 <span>Migration Script: /supabase/migrations/20260902000001_initial_schema.sql</span>
               </span>
               <button
                 onClick={handleCopy}
-                className="flex items-center gap-1 text-xs font-bold text-amber-400 hover:text-amber-300 bg-neutral-800 px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+                className="flex items-center gap-1 text-xs font-bold text-orange-400 hover:text-orange-300 bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-xl border border-white/5 transition-colors cursor-pointer"
               >
-                {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                {copied ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
                 <span>{copied ? 'Copied' : 'Copy SQL'}</span>
               </button>
             </div>
 
-            <pre className="p-4 rounded-2xl bg-neutral-950 border border-neutral-800 text-[11px] font-mono text-neutral-300 overflow-x-auto">
+            <pre className="p-4 rounded-2xl bg-[#05060B] border border-white/5 text-[11px] font-mono text-slate-300 overflow-x-auto">
               {sqlMigrationSummary}
             </pre>
           </div>
 
           {/* Feature Matrix */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-            <div className="p-3.5 rounded-2xl bg-neutral-950 border border-neutral-800 text-xs space-y-1">
-              <span className="font-bold text-neutral-200 flex items-center gap-1.5">
-                <ShieldCheck className="w-4 h-4 text-emerald-400" />
+            <div className="p-4 rounded-2xl bg-[#05060B] border border-white/5 text-xs space-y-1">
+              <span className="font-bold text-white flex items-center gap-1.5">
+                <ShieldCheck className="w-4 h-4 text-green-400" />
                 <span>Row Level Security (RLS)</span>
               </span>
-              <p className="text-neutral-400 text-[11px]">
+              <p className="text-slate-400 text-[11px]">
                 Protects exact seller coordinates until a buyer locks a claim.
               </p>
             </div>
 
-            <div className="p-3.5 rounded-2xl bg-neutral-950 border border-neutral-800 text-xs space-y-1">
-              <span className="font-bold text-neutral-200 flex items-center gap-1.5">
-                <Database className="w-4 h-4 text-amber-400" />
+            <div className="p-4 rounded-2xl bg-[#05060B] border border-white/5 text-xs space-y-1">
+              <span className="font-bold text-white flex items-center gap-1.5">
+                <Database className="w-4 h-4 text-orange-400" />
                 <span>Atomic Concurrency</span>
               </span>
-              <p className="text-neutral-400 text-[11px]">
+              <p className="text-slate-400 text-[11px]">
                 PostgreSQL row locking prevents duplicate claims on urgent free/discounted items.
               </p>
             </div>
@@ -169,7 +156,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;`;
         <div className="pt-2 flex justify-end">
           <button
             onClick={onClose}
-            className="px-5 py-2.5 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 text-neutral-950 cursor-pointer"
+            className="px-6 py-2.5 rounded-2xl text-xs font-black bg-orange-500 hover:bg-orange-400 text-white cursor-pointer shadow-[0_0_20px_rgba(249,115,22,0.4)]"
           >
             Got it
           </button>

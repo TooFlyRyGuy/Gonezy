@@ -28,19 +28,19 @@ export const ListingCard: React.FC<ListingCardProps> = ({
     <div
       id={`listing-card-${listing.id}`}
       onClick={() => onSelect(listing)}
-      className="group relative flex flex-col bg-neutral-900/90 rounded-2xl border border-neutral-800/90 hover:border-amber-500/40 transition-all duration-200 overflow-hidden shadow-sm hover:shadow-lg hover:shadow-amber-500/5 cursor-pointer"
+      className="group relative flex flex-col bg-[#0A0C14] rounded-3xl border border-white/5 hover:border-orange-500/50 transition-all duration-300 overflow-hidden shadow-xl hover:shadow-[0_0_25px_rgba(249,115,22,0.15)] cursor-pointer"
     >
       {/* Image & Badges */}
-      <div className="relative aspect-4/3 w-full bg-neutral-950 overflow-hidden">
+      <div className="relative aspect-4/3 w-full bg-[#05060B] overflow-hidden">
         <img
           src={primaryImage}
           alt={listing.title}
           referrerPolicy="no-referrer"
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           loading="lazy"
         />
 
-        <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/80 via-transparent to-black/20" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0A0C14] via-transparent to-black/40" />
 
         {/* Top Urgency Header */}
         <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2 pointer-events-none">
@@ -51,7 +51,7 @@ export const ListingCard: React.FC<ListingCardProps> = ({
           />
 
           {listing.category && (
-            <span className="px-2 py-1 rounded-md text-[11px] font-medium bg-neutral-950/70 text-neutral-300 backdrop-blur-md border border-neutral-800">
+            <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-black/60 text-slate-300 backdrop-blur-md border border-white/10">
               {listing.category.name}
             </span>
           )}
@@ -59,15 +59,15 @@ export const ListingCard: React.FC<ListingCardProps> = ({
 
         {/* Claimed / Picked Up Overlay */}
         {isClaimed && (
-          <div className="absolute inset-0 bg-neutral-950/75 backdrop-blur-xs flex items-center justify-center p-4">
-            <span className="px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-500 text-neutral-950 shadow-md">
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-xs flex items-center justify-center p-4">
+            <span className="px-4 py-2 rounded-full text-xs font-black uppercase tracking-wider bg-orange-500 text-white shadow-[0_0_15px_rgba(249,115,22,0.5)]">
               Pending Pickup
             </span>
           </div>
         )}
         {isPickedUp && (
-          <div className="absolute inset-0 bg-neutral-950/80 backdrop-blur-xs flex items-center justify-center p-4">
-            <span className="px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-500 text-neutral-950 shadow-md">
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-xs flex items-center justify-center p-4">
+            <span className="px-4 py-2 rounded-full text-xs font-black uppercase tracking-wider bg-green-500 text-white shadow-[0_0_15px_rgba(74,222,128,0.5)]">
               Picked Up
             </span>
           </div>
@@ -76,20 +76,20 @@ export const ListingCard: React.FC<ListingCardProps> = ({
         {/* Bottom Image Stats */}
         <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between">
           <div>
-            <div className="text-[11px] font-medium text-neutral-300 flex items-center gap-1 drop-shadow">
-              <MapPin className="w-3 h-3 text-amber-400" />
+            <div className="text-xs font-bold text-slate-200 flex items-center gap-1.5 drop-shadow-md">
+              <MapPin className="w-3.5 h-3.5 text-orange-400" />
               <span>{formatDistance(listing.calculated_distance_miles)}</span>
             </div>
           </div>
 
           <div className="flex flex-col items-end">
-            <span className="text-xs text-neutral-300 line-through opacity-70 drop-shadow">
+            <span className="text-[11px] text-slate-400 line-through opacity-80 drop-shadow">
               est. ${listing.estimated_value || listing.original_price || 100}
             </span>
-            <div className={`px-2.5 py-0.5 rounded-lg text-lg font-extrabold font-mono shadow-md ${
+            <div className={`px-3 py-1 rounded-xl text-lg font-black font-mono shadow-lg ${
               listing.current_price === 0 
-                ? 'bg-emerald-500 text-neutral-950' 
-                : 'bg-amber-500 text-neutral-950'
+                ? 'bg-green-500 text-white shadow-[0_0_15px_rgba(74,222,128,0.4)]' 
+                : 'bg-orange-500 text-white shadow-[0_0_15px_rgba(249,115,22,0.4)]'
             }`}>
               {formatPrice(listing.current_price)}
             </div>
@@ -98,18 +98,18 @@ export const ListingCard: React.FC<ListingCardProps> = ({
       </div>
 
       {/* Body Content */}
-      <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
+      <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
         <div>
-          <h3 className="text-base font-bold text-neutral-100 line-clamp-1 group-hover:text-amber-400 transition-colors">
+          <h3 className="text-base font-bold text-white line-clamp-1 group-hover:text-orange-400 transition-colors">
             {listing.title}
           </h3>
-          <p className="mt-1 text-xs text-neutral-400 line-clamp-2 leading-relaxed">
+          <p className="mt-1 text-xs text-slate-400 line-clamp-2 leading-relaxed">
             {listing.description || 'Quick removal item. Available for immediate pickup.'}
           </p>
         </div>
 
         {/* Footer & Actions */}
-        <div className="pt-2 border-t border-neutral-800/80 flex items-center justify-between gap-2">
+        <div className="pt-3 border-t border-white/5 flex items-center justify-between gap-2">
           {/* Seller Snapshot */}
           <div className="flex items-center gap-2 min-w-0">
             {listing.seller?.avatar_url ? (
@@ -117,18 +117,18 @@ export const ListingCard: React.FC<ListingCardProps> = ({
                 src={listing.seller.avatar_url}
                 alt="Seller"
                 referrerPolicy="no-referrer"
-                className="w-6 h-6 rounded-full object-cover border border-neutral-700 shrink-0"
+                className="w-6 h-6 rounded-full object-cover border border-white/10 shrink-0"
               />
             ) : (
-              <div className="w-6 h-6 rounded-full bg-neutral-800 flex items-center justify-center text-[10px] font-bold text-neutral-300 shrink-0">
+              <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-bold text-slate-300 shrink-0">
                 {(listing.seller?.display_name || 'S').charAt(0)}
               </div>
             )}
-            <span className="text-xs text-neutral-300 font-medium truncate">
+            <span className="text-xs text-slate-300 font-medium truncate">
               {listing.seller?.business_name || listing.seller?.display_name || 'Verified Seller'}
             </span>
             {listing.seller?.is_verified && (
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+              <ShieldCheck className="w-3.5 h-3.5 text-green-400 shrink-0" />
             )}
           </div>
 
@@ -140,7 +140,7 @@ export const ListingCard: React.FC<ListingCardProps> = ({
                 e.stopPropagation();
                 onQuickClaim(listing);
               }}
-              className="px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-500 hover:bg-amber-400 text-neutral-950 transition-colors shrink-0 flex items-center gap-1 shadow-sm cursor-pointer"
+              className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-orange-500 hover:bg-orange-400 text-white transition-all shrink-0 flex items-center gap-1 shadow-[0_0_10px_rgba(249,115,22,0.3)] hover:shadow-[0_0_15px_rgba(249,115,22,0.5)] cursor-pointer"
             >
               <span>Claim</span>
             </button>

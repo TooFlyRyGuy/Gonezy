@@ -1,5 +1,5 @@
 {
-  "name": "NabGo",
+  "name": "Gonezy",
   "description": "Hyperlocal, urgency-based marketplace for fast item removal and escalating pricing schedules.",
   "requestFramePermissions": ["geolocation"],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]

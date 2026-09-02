@@ -5,7 +5,6 @@ import {
   PlusCircle,
   Clock,
   User,
-  Package,
 } from 'lucide-react';
 
 interface BottomNavProps {
@@ -18,54 +17,86 @@ export const BottomNav: React.FC<BottomNavProps> = ({
   onNavigate,
 }) => {
   return (
-    <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-neutral-950/95 backdrop-blur-md border-t border-neutral-800/80 px-2 py-1.5 flex items-center justify-around">
+    <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0A0C14] border-t border-white/5 px-4 py-2 flex items-center justify-around">
       <button
         onClick={() => onNavigate('explore')}
-        className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-colors cursor-pointer ${
-          currentTab === 'explore' ? 'text-amber-400 font-bold' : 'text-neutral-400 hover:text-neutral-200'
+        className={`flex flex-col items-center gap-1 group transition-all cursor-pointer ${
+          currentTab === 'explore' ? 'opacity-100' : 'opacity-40 hover:opacity-100'
         }`}
       >
-        <Compass className="w-5 h-5" />
-        <span className="text-[10px]">Explore</span>
+        <div className={`p-2 rounded-xl transition-all ${
+          currentTab === 'explore'
+            ? 'bg-orange-500 text-white shadow-[0_0_15px_rgba(249,115,22,0.4)]'
+            : 'text-slate-300'
+        }`}>
+          <Compass className="w-5 h-5" />
+        </div>
+        <span className="text-[10px] font-bold uppercase tracking-tighter text-white">Explore</span>
       </button>
 
       <button
         onClick={() => onNavigate('wanted')}
-        className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-colors cursor-pointer ${
-          currentTab === 'wanted' ? 'text-amber-400 font-bold' : 'text-neutral-400 hover:text-neutral-200'
+        className={`flex flex-col items-center gap-1 group transition-all cursor-pointer ${
+          currentTab === 'wanted' ? 'opacity-100' : 'opacity-40 hover:opacity-100'
         }`}
       >
-        <Radio className="w-5 h-5" />
-        <span className="text-[10px]">Wanted</span>
+        <div className={`p-2 rounded-xl transition-all ${
+          currentTab === 'wanted'
+            ? 'bg-orange-500 text-white shadow-[0_0_15px_rgba(249,115,22,0.4)]'
+            : 'text-slate-300'
+        }`}>
+          <Radio className="w-5 h-5" />
+        </div>
+        <span className="text-[10px] font-bold uppercase tracking-tighter text-white">Wanted</span>
       </button>
 
       {/* Primary Center Action */}
       <button
         onClick={() => onNavigate('sell')}
-        className="flex flex-col items-center gap-0.5 -mt-4 py-1 px-3 rounded-2xl bg-amber-500 text-neutral-950 shadow-lg shadow-amber-500/30 cursor-pointer"
+        className={`flex flex-col items-center gap-1 group transition-all cursor-pointer ${
+          currentTab === 'sell' ? 'opacity-100' : 'opacity-40 hover:opacity-100'
+        }`}
       >
-        <PlusCircle className="w-6 h-6" />
-        <span className="text-[10px] font-extrabold uppercase tracking-wider">Post</span>
+        <div className={`p-2 rounded-xl transition-all ${
+          currentTab === 'sell'
+            ? 'bg-orange-500 text-white shadow-[0_0_15px_rgba(249,115,22,0.4)]'
+            : 'text-slate-300'
+        }`}>
+          <PlusCircle className="w-5 h-5" />
+        </div>
+        <span className="text-[10px] font-bold uppercase tracking-tighter text-white">Sell</span>
       </button>
 
       <button
         onClick={() => onNavigate('activity')}
-        className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-colors cursor-pointer ${
-          currentTab === 'activity' ? 'text-amber-400 font-bold' : 'text-neutral-400 hover:text-neutral-200'
+        className={`flex flex-col items-center gap-1 group transition-all cursor-pointer ${
+          currentTab === 'activity' ? 'opacity-100' : 'opacity-40 hover:opacity-100'
         }`}
       >
-        <Clock className="w-5 h-5" />
-        <span className="text-[10px]">Activity</span>
+        <div className={`p-2 rounded-xl transition-all ${
+          currentTab === 'activity'
+            ? 'bg-orange-500 text-white shadow-[0_0_15px_rgba(249,115,22,0.4)]'
+            : 'text-slate-300'
+        }`}>
+          <Clock className="w-5 h-5" />
+        </div>
+        <span className="text-[10px] font-bold uppercase tracking-tighter text-white">Activity</span>
       </button>
 
       <button
         onClick={() => onNavigate('profile')}
-        className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-colors cursor-pointer ${
-          currentTab === 'profile' ? 'text-amber-400 font-bold' : 'text-neutral-400 hover:text-neutral-200'
+        className={`flex flex-col items-center gap-1 group transition-all cursor-pointer ${
+          currentTab === 'profile' ? 'opacity-100' : 'opacity-40 hover:opacity-100'
         }`}
       >
-        <User className="w-5 h-5" />
-        <span className="text-[10px]">Profile</span>
+        <div className={`p-2 rounded-xl transition-all ${
+          currentTab === 'profile'
+            ? 'bg-orange-500 text-white shadow-[0_0_15px_rgba(249,115,22,0.4)]'
+            : 'text-slate-300'
+        }`}>
+          <User className="w-5 h-5" />
+        </div>
+        <span className="text-[10px] font-bold uppercase tracking-tighter text-white">Account</span>
       </button>
     </nav>
   );

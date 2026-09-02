@@ -31,8 +31,6 @@ export type ListingStatus =
   | 'cancelled'
   | 'disposed';
 
-export type ClaimStatus = 'unclaimed' | 'claimed' | 'completed';
-
 export type ClaimState =
   | 'pending'
   | 'active'
@@ -40,6 +38,16 @@ export type ClaimState =
   | 'cancelled'
   | 'expired'
   | 'no_show';
+
+export type NotificationType =
+  | 'matching_item_posted'
+  | 'price_escalation_imminent'
+  | 'item_claimed'
+  | 'claim_accepted'
+  | 'pickup_deadline_approaching'
+  | 'claim_expired'
+  | 'item_available_again'
+  | string;
 
 export interface Database {
   public: {
@@ -86,8 +94,8 @@ export interface Database {
       categories: {
         Row: {
           id: string;
-          slug: string;
           name: string;
+          slug: string;
           description: string | null;
           icon_name: string;
           sort_order: number;
@@ -96,8 +104,8 @@ export interface Database {
         };
         Insert: {
           id?: string;
-          slug: string;
           name: string;
+          slug: string;
           description?: string | null;
           icon_name?: string;
           sort_order?: number;
@@ -126,7 +134,6 @@ export interface Database {
           current_price: number;
           original_price: number;
           is_free: boolean;
-          claim_status: ClaimStatus;
           created_at: string;
           updated_at: string;
         };
@@ -149,7 +156,6 @@ export interface Database {
           current_price?: number;
           original_price?: number;
           is_free?: boolean;
-          claim_status?: ClaimStatus;
           created_at?: string;
           updated_at?: string;
         };
@@ -244,7 +250,7 @@ export interface Database {
           price_at_claim: number;
           status?: ClaimState;
           claimed_at?: string;
-          pickup_expires_at: string;
+          pickup_expires_at?: string;
           completed_at?: string | null;
           cancelled_at?: string | null;
           cancellation_reason?: string | null;
@@ -253,6 +259,57 @@ export interface Database {
         };
         Update: Partial<Database['public']['Tables']['claims']['Insert']>;
       };
+      notifications: {
+        Row: {
+          id: string;
+          user_id: string;
+          type: string;
+          title: string;
+          body: string | null;
+          listing_id: string | null;
+          claim_id: string | null;
+          is_read: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          type: string;
+          title: string;
+          body?: string | null;
+          listing_id?: string | null;
+          claim_id?: string | null;
+          is_read?: boolean;
+          created_at?: string;
+        };
+        Update: Partial<Database['public']['Tables']['notifications']['Insert']>;
+      };
+    };
+    Views: {
+      public_listings: {
+        Row: {
+          id: string;
+          seller_id: string;
+          title: string;
+          description: string | null;
+          category_id: string | null;
+          condition: ItemCondition;
+          estimated_value: number;
+          status: ListingStatus;
+          pickup_address_text: string | null;
+          pickup_latitude: number | null;
+          pickup_longitude: number | null;
+          approximate_public_latitude: number;
+          approximate_public_longitude: number;
+          available_from: string;
+          pickup_deadline: string;
+          current_price: number;
+          original_price: number;
+          is_free: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+      };
     };
     Functions: {
       get_current_listing_price: {
@@ -260,7 +317,7 @@ export interface Database {
         Returns: number;
       };
       claim_listing: {
-        Args: { p_listing_id: string; p_buyer_id: string };
+        Args: { p_listing_id: string; p_buyer_id?: string };
         Returns: {
           success: boolean;
           error?: string;
@@ -270,8 +327,16 @@ export interface Database {
         };
       };
       complete_pickup: {
-        Args: { p_claim_id: string; p_user_id: string };
+        Args: { p_claim_id: string; p_user_id?: string };
         Returns: { success: boolean; error?: string };
+      };
+      cancel_claim: {
+        Args: { p_claim_id: string; p_user_id?: string; p_reason?: string };
+        Returns: { success: boolean; error?: string };
+      };
+      expire_overdue_listings: {
+        Args: Record<string, never>;
+        Returns: number;
       };
     };
   };
@@ -284,3 +349,4 @@ export type ListingImage = Database['public']['Tables']['listing_images']['Row']
 export type ListingPriceWindow = Database['public']['Tables']['listing_price_windows']['Row'];
 export type BuyerInterest = Database['public']['Tables']['buyer_interests']['Row'];
 export type Claim = Database['public']['Tables']['claims']['Row'];
+export type Notification = Database['public']['Tables']['notifications']['Row'];

@@ -1,4 +1,4 @@
-import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { supabase, isSupabaseLive, disableSupabaseLiveMode, isSupabaseAuthOrKeyError } from '../lib/supabase';
 import { Category } from '../types/marketplace';
 
 // Default categories fallback if database seed hasn't been applied yet
@@ -22,7 +22,7 @@ export const DEFAULT_CATEGORIES: Category[] = [
 
 export const categoryService = {
   async getCategories(): Promise<Category[]> {
-    if (!isSupabaseConfigured) {
+    if (!isSupabaseLive()) {
       return DEFAULT_CATEGORIES;
     }
 
@@ -34,14 +34,19 @@ export const categoryService = {
         .order('sort_order', { ascending: true });
 
       if (error) {
-        console.warn('Error fetching categories from Supabase, falling back to defaults:', error.message);
+        if (isSupabaseAuthOrKeyError(error)) {
+          disableSupabaseLiveMode('Authentication required');
+        }
         return DEFAULT_CATEGORIES;
       }
 
       return data && data.length > 0 ? data : DEFAULT_CATEGORIES;
-    } catch (err) {
-      console.warn('Could not query categories table:', err);
+    } catch (err: any) {
+      if (isSupabaseAuthOrKeyError(err)) {
+        disableSupabaseLiveMode('Authentication required');
+      }
       return DEFAULT_CATEGORIES;
     }
   },
 };
+

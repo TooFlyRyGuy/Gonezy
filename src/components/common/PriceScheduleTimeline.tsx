@@ -16,7 +16,7 @@ export const PriceScheduleTimeline: React.FC<PriceScheduleTimelineProps> = ({
 }) => {
   if (!windows || windows.length === 0) {
     return (
-      <div className="text-xs text-neutral-400 py-2">
+      <div className="text-xs text-slate-400 py-2">
         Flat pricing until pickup deadline.
       </div>
     );
@@ -26,15 +26,15 @@ export const PriceScheduleTimeline: React.FC<PriceScheduleTimelineProps> = ({
   const now = Date.now();
 
   return (
-    <div className="w-full space-y-2">
-      <div className="flex items-center justify-between text-xs font-semibold text-neutral-400 uppercase tracking-wider">
+    <div className="w-full space-y-2.5">
+      <div className="flex items-center justify-between text-xs font-bold text-slate-400 uppercase tracking-wider">
         <span>Urgency Price Schedule</span>
-        <span className="text-[11px] font-normal text-amber-400/90 lowercase">
+        <span className="text-[11px] font-medium text-orange-400 lowercase">
           claims lock current price
         </span>
       </div>
 
-      <div className={`grid gap-2 ${compact ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-1 sm:grid-cols-2 md:grid-cols-4'}`}>
+      <div className={`grid gap-2.5 ${compact ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-1 sm:grid-cols-2 md:grid-cols-4'}`}>
         {sorted.map((w, index) => {
           const startsAt = new Date(w.starts_at).getTime();
           const endsAt = new Date(w.ends_at).getTime();
@@ -54,41 +54,41 @@ export const PriceScheduleTimeline: React.FC<PriceScheduleTimelineProps> = ({
             <div
               key={w.id || index}
               id={`price-window-card-${index}`}
-              className={`relative p-3 rounded-xl border transition-all ${
+              className={`relative p-3.5 rounded-2xl border transition-all ${
                 isActive
-                  ? 'bg-amber-500/10 border-amber-500/50 shadow-sm shadow-amber-500/10 ring-1 ring-amber-500/30'
+                  ? 'bg-orange-500/10 border-orange-500/50 shadow-[0_0_15px_rgba(249,115,22,0.15)] ring-1 ring-orange-500/30'
                   : isPassed
-                  ? 'bg-neutral-900/40 border-neutral-800/80 opacity-50'
-                  : 'bg-neutral-900/80 border-neutral-800'
+                  ? 'bg-white/2 border-white/5 opacity-40'
+                  : 'bg-[#0A0C14] border-white/5 hover:border-white/10'
               }`}
             >
               {isActive && (
-                <div className="absolute -top-2 right-2 px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-500 text-neutral-950 uppercase tracking-wider shadow-sm">
+                <div className="absolute -top-2.5 right-3 px-2 py-0.5 rounded-full text-[9px] font-black bg-orange-500 text-white uppercase tracking-widest shadow-[0_0_10px_rgba(249,115,22,0.5)]">
                   Active Now
                 </div>
               )}
 
-              <div className="flex items-center justify-between gap-1 mb-1">
-                <span className="text-[11px] font-mono text-neutral-400">
+              <div className="flex items-center justify-between gap-1 mb-1.5">
+                <span className="text-[11px] font-mono font-bold text-slate-400 uppercase">
                   Stage {index + 1}
                 </span>
-                <span className="text-[11px] text-neutral-400 flex items-center gap-0.5">
-                  <Clock className="w-3 h-3" />
+                <span className="text-[11px] text-slate-400 flex items-center gap-1 font-mono">
+                  <Clock className="w-3 h-3 text-orange-400" />
                   {durationLabel}
                 </span>
               </div>
 
-              <div className="flex items-baseline gap-1 my-1">
-                <span className={`text-xl font-bold font-mono ${
-                  w.price === 0 ? 'text-emerald-400' : isActive ? 'text-amber-300' : 'text-neutral-200'
+              <div className="flex items-baseline gap-1 my-1.5">
+                <span className={`text-2xl font-black font-mono tracking-tight ${
+                  w.price === 0 ? 'text-green-400' : isActive ? 'text-orange-400' : 'text-white'
                 }`}>
                   {formatPrice(w.price)}
                 </span>
               </div>
 
-              <div className="text-[10px] text-neutral-400 font-mono flex items-center gap-1">
+              <div className="text-[10px] text-slate-400 font-mono flex items-center gap-1 pt-1 border-t border-white/5">
                 <span>{startTimeStr}</span>
-                <ArrowRight className="w-2.5 h-2.5 text-neutral-500" />
+                <ArrowRight className="w-2.5 h-2.5 text-slate-500" />
                 <span>{endTimeStr}</span>
               </div>
             </div>

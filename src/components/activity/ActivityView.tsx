@@ -75,15 +75,15 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Role View Toggle */}
-      <div className="flex items-center justify-between p-2 bg-neutral-900 rounded-2xl border border-neutral-800">
-        <div className="flex items-center gap-1.5 w-full">
+      <div className="flex items-center justify-between p-2 bg-[#0A0C14] rounded-3xl border border-white/5 shadow-xl">
+        <div className="flex items-center gap-2 w-full">
           <button
             id="tab-buyer-activity"
             onClick={() => setRoleTab('buyer')}
-            className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-2 ${
+            className={`flex-1 py-3 rounded-2xl text-xs font-black transition-all cursor-pointer flex items-center justify-center gap-2 ${
               roleTab === 'buyer'
-                ? 'bg-amber-500 text-neutral-950 shadow-sm'
-                : 'text-neutral-400 hover:text-neutral-200'
+                ? 'bg-orange-500 text-white shadow-[0_0_15px_rgba(249,115,22,0.4)]'
+                : 'text-slate-400 hover:text-white hover:bg-white/5'
             }`}
           >
             <Truck className="w-4 h-4" />
@@ -93,10 +93,10 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
           <button
             id="tab-seller-activity"
             onClick={() => setRoleTab('seller')}
-            className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-2 ${
+            className={`flex-1 py-3 rounded-2xl text-xs font-black transition-all cursor-pointer flex items-center justify-center gap-2 ${
               roleTab === 'seller'
-                ? 'bg-amber-500 text-neutral-950 shadow-sm'
-                : 'text-neutral-400 hover:text-neutral-200'
+                ? 'bg-orange-500 text-white shadow-[0_0_15px_rgba(249,115,22,0.4)]'
+                : 'text-slate-400 hover:text-white hover:bg-white/5'
             }`}
           >
             <Package className="w-4 h-4" />
@@ -106,24 +106,24 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
       </div>
 
       {isLoading ? (
-        <div className="p-12 text-center text-xs text-neutral-400">Loading activity...</div>
+        <div className="p-12 text-center text-xs text-slate-400">Loading activity...</div>
       ) : roleTab === 'buyer' ? (
         /* BUYER CLAIMS VIEW */
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-neutral-400">
+            <h3 className="text-xs font-black uppercase tracking-wider text-slate-400">
               Your Item Reservations & Pickups
             </h3>
-            <span className="text-xs text-neutral-500">
+            <span className="text-xs text-slate-500">
               Address unlocked on active reservations
             </span>
           </div>
 
           {buyerClaims.length === 0 ? (
-            <div className="p-10 rounded-3xl bg-neutral-900/50 border border-neutral-800 text-center space-y-3">
-              <Truck className="w-10 h-10 text-neutral-600 mx-auto" />
-              <h4 className="text-sm font-bold text-neutral-200">No active claims</h4>
-              <p className="text-xs text-neutral-400 max-w-sm mx-auto">
+            <div className="p-10 rounded-3xl bg-[#0A0C14] border border-white/5 text-center space-y-3">
+              <Truck className="w-10 h-10 text-slate-600 mx-auto" />
+              <h4 className="text-sm font-bold text-white">No active claims</h4>
+              <p className="text-xs text-slate-400 max-w-sm mx-auto">
                 Explore the marketplace and lock in early urgency pricing to claim items for pickup.
               </p>
             </div>
@@ -137,26 +137,26 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
                   <div
                     key={c.id}
                     id={`claim-row-${c.id}`}
-                    className="p-4 sm:p-5 rounded-2xl bg-neutral-900 border border-neutral-800 space-y-3"
+                    className="p-5 rounded-3xl bg-[#0A0C14] border border-white/10 space-y-3.5 shadow-lg"
                   >
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                      <div className="flex items-center gap-3 min-w-0">
+                      <div className="flex items-center gap-3.5 min-w-0">
                         {c.listing?.images?.[0]?.storage_path ? (
                           <img
                             src={c.listing.images[0].storage_path}
                             alt="Item"
-                            className="w-14 h-14 rounded-xl object-cover border border-neutral-700 shrink-0"
+                            className="w-14 h-14 rounded-2xl object-cover border border-white/10 shrink-0"
                           />
                         ) : (
-                          <div className="w-14 h-14 rounded-xl bg-neutral-950 border border-neutral-800 flex items-center justify-center shrink-0">
-                            <Package className="w-6 h-6 text-neutral-600" />
+                          <div className="w-14 h-14 rounded-2xl bg-[#05060B] border border-white/5 flex items-center justify-center shrink-0">
+                            <Package className="w-6 h-6 text-slate-600" />
                           </div>
                         )}
                         <div className="min-w-0">
-                          <h4 className="text-sm font-bold text-neutral-100 truncate">
+                          <h4 className="text-sm font-black text-white truncate">
                             {c.listing?.title || 'Claimed Item'}
                           </h4>
-                          <span className="text-xs text-neutral-400 block">
+                          <span className="text-xs text-slate-400 block mt-0.5">
                             Seller: {c.listing?.seller?.business_name || c.listing?.seller?.display_name || 'Hauler'}
                           </span>
                         </div>
@@ -164,18 +164,18 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
 
                       <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0">
                         <div className="text-right">
-                          <span className="text-[10px] text-neutral-400 block">Locked Price</span>
-                          <span className="text-base font-bold font-mono text-amber-400">
+                          <span className="text-[10px] text-slate-400 block uppercase font-bold tracking-wider">Locked Price</span>
+                          <span className="text-lg font-black font-mono text-orange-400">
                             {formatPrice(c.price_at_claim)}
                           </span>
                         </div>
 
-                        <span className={`px-2.5 py-1 rounded-full text-xs font-bold capitalize ${
+                        <span className={`px-3 py-1 rounded-xl text-xs font-black capitalize ${
                           isActive
-                            ? 'bg-amber-500/15 text-amber-300 border border-amber-500/30'
+                            ? 'bg-orange-500/20 text-orange-300 border border-orange-500/40 shadow-[0_0_10px_rgba(249,115,22,0.2)]'
                             : isCompleted
-                            ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
-                            : 'bg-neutral-800 text-neutral-400'
+                            ? 'bg-green-500/20 text-green-300 border border-green-500/40'
+                            : 'bg-white/5 text-slate-400 border border-white/5'
                         }`}>
                           {c.status}
                         </span>
@@ -184,17 +184,17 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
 
                     {/* Unlocked Pickup Details */}
                     {isActive && c.listing && (
-                      <div className="p-3.5 rounded-xl bg-neutral-950 border border-neutral-800/90 space-y-2 text-xs">
+                      <div className="p-4 rounded-2xl bg-[#05060B] border border-white/5 space-y-2 text-xs">
                         <div className="flex items-center justify-between">
-                          <span className="font-bold text-amber-400 flex items-center gap-1">
+                          <span className="font-black text-orange-400 flex items-center gap-1.5 uppercase tracking-wider">
                             <MapPin className="w-3.5 h-3.5" />
                             <span>Pickup Location (Private & Confirmed)</span>
                           </span>
-                          <span className="text-neutral-400 font-mono">
+                          <span className="text-slate-400 font-mono">
                             Arrive by: {new Date(c.pickup_expires_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                           </span>
                         </div>
-                        <p className="text-neutral-200 font-medium font-mono text-sm">
+                        <p className="text-white font-semibold font-mono text-sm">
                           {c.listing.pickup_address_text}
                         </p>
                       </div>
@@ -202,17 +202,17 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
 
                     {/* Actions */}
                     {isActive && (
-                      <div className="flex items-center justify-end gap-2 pt-2 border-t border-neutral-800/60">
+                      <div className="flex items-center justify-end gap-2 pt-2 border-t border-white/5">
                         <button
                           onClick={() => handleCancelClaim(c.id, c.listing_id)}
-                          className="px-3 py-1.5 rounded-lg text-xs font-semibold text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer"
+                          className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer"
                         >
                           Release / Cancel Claim
                         </button>
 
                         <button
                           onClick={() => handleCompletePickup(c.id)}
-                          className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-bold bg-emerald-500 hover:bg-emerald-400 text-neutral-950 transition-colors cursor-pointer"
+                          className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black bg-green-500 hover:bg-green-400 text-white transition-all cursor-pointer shadow-[0_0_15px_rgba(74,222,128,0.3)] hover:scale-[1.02]"
                         >
                           <CheckCircle2 className="w-3.5 h-3.5" />
                           <span>Mark Pickup Complete</span>
@@ -229,16 +229,16 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
         /* SELLER LISTINGS & CLAIMS VIEW */
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-neutral-400">
+            <h3 className="text-xs font-black uppercase tracking-wider text-slate-400">
               Your Posted Items & Removal Progress
             </h3>
           </div>
 
           {sellerListings.length === 0 ? (
-            <div className="p-10 rounded-3xl bg-neutral-900/50 border border-neutral-800 text-center space-y-3">
-              <Package className="w-10 h-10 text-neutral-600 mx-auto" />
-              <h4 className="text-sm font-bold text-neutral-200">No listings posted yet</h4>
-              <p className="text-xs text-neutral-400 max-w-sm mx-auto">
+            <div className="p-10 rounded-3xl bg-[#0A0C14] border border-white/5 text-center space-y-3">
+              <Package className="w-10 h-10 text-slate-600 mx-auto" />
+              <h4 className="text-sm font-bold text-white">No listings posted yet</h4>
+              <p className="text-xs text-slate-400 max-w-sm mx-auto">
                 Post usable furniture, tools, or appliances to have local buyers pick them up fast.
               </p>
             </div>
@@ -248,26 +248,26 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
                 <div
                   key={listing.id}
                   id={`seller-listing-row-${listing.id}`}
-                  className="p-4 sm:p-5 rounded-2xl bg-neutral-900 border border-neutral-800 space-y-3"
+                  className="p-5 rounded-3xl bg-[#0A0C14] border border-white/10 space-y-3.5 shadow-lg"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div className="flex items-center gap-3 min-w-0">
+                    <div className="flex items-center gap-3.5 min-w-0">
                       {listing.images?.[0]?.storage_path ? (
                         <img
                           src={listing.images[0].storage_path}
                           alt="Item"
-                          className="w-14 h-14 rounded-xl object-cover border border-neutral-700 shrink-0"
+                          className="w-14 h-14 rounded-2xl object-cover border border-white/10 shrink-0"
                         />
                       ) : (
-                        <div className="w-14 h-14 rounded-xl bg-neutral-950 border border-neutral-800 flex items-center justify-center shrink-0">
-                          <Package className="w-6 h-6 text-neutral-600" />
+                        <div className="w-14 h-14 rounded-2xl bg-[#05060B] border border-white/5 flex items-center justify-center shrink-0">
+                          <Package className="w-6 h-6 text-slate-600" />
                         </div>
                       )}
                       <div className="min-w-0">
-                        <h4 className="text-sm font-bold text-neutral-100 truncate">
+                        <h4 className="text-sm font-black text-white truncate">
                           {listing.title}
                         </h4>
-                        <span className="text-xs text-neutral-400 block">
+                        <span className="text-xs text-slate-400 block mt-0.5">
                           Deadline: {new Date(listing.pickup_deadline).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </span>
                       </div>
@@ -275,32 +275,32 @@ export const ActivityView: React.FC<ActivityViewProps> = ({
 
                     <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0">
                       <div className="text-right">
-                        <span className="text-[10px] text-neutral-400 block">Current Price</span>
-                        <span className="text-base font-bold font-mono text-amber-400">
+                        <span className="text-[10px] text-slate-400 block uppercase font-bold tracking-wider">Current Price</span>
+                        <span className="text-lg font-black font-mono text-orange-400">
                           {formatPrice(listing.current_price)}
                         </span>
                       </div>
 
-                      <span className={`px-2.5 py-1 rounded-full text-xs font-bold capitalize ${
+                      <span className={`px-3 py-1 rounded-xl text-xs font-black capitalize ${
                         listing.status === 'active'
-                          ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
+                          ? 'bg-green-500/20 text-green-300 border border-green-500/40 shadow-[0_0_10px_rgba(74,222,128,0.2)]'
                           : listing.status === 'claimed'
-                          ? 'bg-amber-500/15 text-amber-300 border border-amber-500/30'
-                          : 'bg-neutral-800 text-neutral-400'
+                          ? 'bg-orange-500/20 text-orange-300 border border-orange-500/40 shadow-[0_0_10px_rgba(249,115,22,0.2)]'
+                          : 'bg-white/5 text-slate-400 border border-white/5'
                       }`}>
                         {listing.status}
                       </span>
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between pt-2 border-t border-neutral-800/60 text-xs">
-                    <span className="text-neutral-400">
+                  <div className="flex items-center justify-between pt-2.5 border-t border-white/5 text-xs">
+                    <span className="text-slate-400">
                       {listing.claim_status === 'claimed' ? '⚡ A buyer has locked this claim!' : 'Awaiting local claims'}
                     </span>
 
                     <button
                       onClick={() => onSelectListing(listing)}
-                      className="text-amber-400 hover:text-amber-300 font-bold flex items-center gap-1 cursor-pointer"
+                      className="text-orange-400 hover:text-orange-300 font-bold flex items-center gap-1 cursor-pointer"
                     >
                       <span>View Detail</span>
                       <ArrowRight className="w-3.5 h-3.5" />

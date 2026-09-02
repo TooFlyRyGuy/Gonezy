@@ -1,5 +1,5 @@
 /**
- * Geolocation privacy and calculation helpers for NabGo
+ * Geolocation privacy and calculation helpers for Gonezy
  */
 
 /**

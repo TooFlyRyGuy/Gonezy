@@ -98,17 +98,17 @@ export const WantedItemsView: React.FC<WantedItemsViewProps> = ({
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Header Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 sm:p-6 bg-gradient-to-r from-neutral-900 to-neutral-900/60 rounded-3xl border border-neutral-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 sm:p-6 bg-[#0A0C14] rounded-3xl border border-white/5 shadow-xl">
         <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <div className="p-2 rounded-xl bg-amber-500/15 text-amber-400">
+          <div className="flex items-center gap-2.5">
+            <div className="p-2.5 rounded-2xl bg-orange-500/15 text-orange-400 border border-orange-500/30 shadow-[0_0_15px_rgba(249,115,22,0.2)]">
               <Radio className="w-5 h-5 animate-pulse" />
             </div>
-            <h1 className="text-xl font-bold text-neutral-100">
+            <h1 className="text-xl font-black text-white">
               Wanted Items & Urgency Alerts
             </h1>
           </div>
-          <p className="text-xs text-neutral-400">
+          <p className="text-xs text-slate-400">
             Get instantly notified when haulers or cleanout crews post items matching your interests nearby.
           </p>
         </div>
@@ -116,7 +116,7 @@ export const WantedItemsView: React.FC<WantedItemsViewProps> = ({
         <button
           id="create-alert-btn"
           onClick={() => setIsModalOpen(true)}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs bg-amber-500 hover:bg-amber-400 text-neutral-950 transition-colors shrink-0 cursor-pointer shadow-md shadow-amber-500/20"
+          className="flex items-center gap-2 px-5 py-3 rounded-2xl font-black text-xs bg-orange-500 hover:bg-orange-400 text-white transition-all shrink-0 cursor-pointer shadow-[0_0_20px_rgba(249,115,22,0.4)] hover:scale-[1.02] active:scale-[0.98]"
         >
           <Plus className="w-4 h-4" />
           <span>New Alert</span>
@@ -125,23 +125,23 @@ export const WantedItemsView: React.FC<WantedItemsViewProps> = ({
 
       {/* List of Interests */}
       {isLoading ? (
-        <div className="p-12 text-center text-xs text-neutral-400">Loading your alerts...</div>
+        <div className="p-12 text-center text-xs text-slate-400">Loading your alerts...</div>
       ) : interests.length === 0 ? (
-        <div className="p-12 rounded-3xl bg-neutral-900/50 border border-neutral-800 text-center space-y-3">
-          <Bell className="w-10 h-10 text-neutral-600 mx-auto" />
-          <h3 className="text-sm font-bold text-neutral-200">No active wanted alerts</h3>
-          <p className="text-xs text-neutral-400 max-w-sm mx-auto">
+        <div className="p-12 rounded-3xl bg-[#0A0C14] border border-white/5 text-center space-y-3">
+          <Bell className="w-10 h-10 text-slate-600 mx-auto" />
+          <h3 className="text-sm font-bold text-white">No active wanted alerts</h3>
+          <p className="text-xs text-slate-400 max-w-sm mx-auto">
             Set up alerts for tools, patio sets, scrap metal, or commercial gear to grab them first when posted.
           </p>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 text-neutral-950 cursor-pointer"
+            className="px-5 py-2.5 rounded-2xl text-xs font-black bg-orange-500 text-white cursor-pointer shadow-[0_0_15px_rgba(249,115,22,0.3)] hover:scale-[1.02]"
           >
             Create Your First Alert
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {interests.map((item) => {
             const categoryObj = categories.find((c) => c.id === item.category_id);
 
@@ -149,22 +149,22 @@ export const WantedItemsView: React.FC<WantedItemsViewProps> = ({
               <div
                 key={item.id}
                 id={`interest-card-${item.id}`}
-                className={`p-4 rounded-2xl border transition-all flex flex-col justify-between space-y-3 ${
+                className={`p-5 rounded-3xl border transition-all flex flex-col justify-between space-y-4 ${
                   item.is_active
-                    ? 'bg-neutral-900 border-neutral-800'
-                    : 'bg-neutral-950/60 border-neutral-850 opacity-60'
+                    ? 'bg-[#0A0C14] border-white/10 shadow-lg'
+                    : 'bg-[#0A0C14]/40 border-white/5 opacity-60'
                 }`}
               >
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className={`w-2 h-2 rounded-full ${item.is_active ? 'bg-emerald-400 animate-pulse' : 'bg-neutral-600'}`} />
-                      <h4 className="text-sm font-bold text-neutral-100">
+                      <span className={`w-2.5 h-2.5 rounded-full ${item.is_active ? 'bg-green-400 animate-pulse shadow-[0_0_8px_#4ade80]' : 'bg-slate-600'}`} />
+                      <h4 className="text-sm font-black text-white">
                         "{item.search_text}"
                       </h4>
                     </div>
                     {categoryObj && (
-                      <span className="text-[11px] text-amber-400/90 font-medium block mt-1">
+                      <span className="text-[11px] text-orange-400 font-bold block mt-1">
                         Category: {categoryObj.name}
                       </span>
                     )}
@@ -172,30 +172,30 @@ export const WantedItemsView: React.FC<WantedItemsViewProps> = ({
 
                   <button
                     onClick={() => handleDelete(item.id)}
-                    className="p-1.5 text-neutral-500 hover:text-rose-400 rounded-lg transition-colors cursor-pointer"
+                    className="p-2 text-slate-500 hover:text-red-400 rounded-xl transition-colors cursor-pointer hover:bg-white/5"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
 
-                <div className="flex items-center justify-between pt-2 border-t border-neutral-800/60 text-xs text-neutral-400">
-                  <div className="flex items-center gap-3">
-                    <span className="flex items-center gap-1">
-                      <MapPin className="w-3 h-3 text-neutral-500" />
+                <div className="flex items-center justify-between pt-3 border-t border-white/5 text-xs text-slate-400">
+                  <div className="flex items-center gap-3 font-medium">
+                    <span className="flex items-center gap-1 text-slate-300">
+                      <MapPin className="w-3.5 h-3.5 text-orange-400" />
                       {item.radius_miles} mi radius
                     </span>
                     <span>•</span>
-                    <span>
+                    <span className="text-slate-200">
                       {item.max_price ? `Max $${item.max_price}` : 'Any Price / Free'}
                     </span>
                   </div>
 
                   <button
                     onClick={() => handleToggle(item.id, item.is_active)}
-                    className={`px-2.5 py-1 rounded-full text-[11px] font-semibold transition-colors cursor-pointer ${
+                    className={`px-3 py-1 rounded-xl text-[11px] font-black transition-colors cursor-pointer ${
                       item.is_active
-                        ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
-                        : 'bg-neutral-800 text-neutral-400'
+                        ? 'bg-green-500/20 text-green-300 border border-green-500/40'
+                        : 'bg-white/5 text-slate-400 border border-white/5'
                     }`}
                   >
                     {item.is_active ? 'Active' : 'Paused'}
@@ -210,20 +210,20 @@ export const WantedItemsView: React.FC<WantedItemsViewProps> = ({
       {/* Create Modal */}
       {isModalOpen && (
         <div
-          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4"
           onClick={() => setIsModalOpen(false)}
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-md bg-neutral-900 border border-neutral-800 rounded-3xl p-6 space-y-4 shadow-2xl text-neutral-100"
+            className="w-full max-w-md bg-[#0A0C14] border border-white/10 rounded-3xl p-6 space-y-4 shadow-2xl text-slate-100"
           >
-            <div className="flex items-center justify-between border-b border-neutral-800 pb-3">
-              <h3 className="text-base font-bold text-neutral-100">
+            <div className="flex items-center justify-between border-b border-white/5 pb-3">
+              <h3 className="text-base font-black text-white">
                 Create Wanted Item Alert
               </h3>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="p-1 text-neutral-400 hover:text-neutral-200 cursor-pointer"
+                className="p-1.5 rounded-full bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white cursor-pointer transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -231,7 +231,7 @@ export const WantedItemsView: React.FC<WantedItemsViewProps> = ({
 
             <form onSubmit={handleCreate} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-1">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
                   Item Description or Keywords *
                 </label>
                 <input
@@ -240,18 +240,18 @@ export const WantedItemsView: React.FC<WantedItemsViewProps> = ({
                   value={searchText}
                   onChange={(e) => setSearchText(e.target.value)}
                   placeholder="e.g., Commercial refrigerator, DeWalt tools, teak furniture"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-sm text-neutral-100 focus:outline-hidden focus:border-amber-500"
+                  className="w-full px-4 py-3 rounded-2xl bg-[#05060B] border border-white/10 text-sm text-white focus:outline-hidden focus:border-orange-500"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-1">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
                   Category (Optional)
                 </label>
                 <select
                   value={categoryId}
                   onChange={(e) => setCategoryId(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-sm text-neutral-100 focus:outline-hidden focus:border-amber-500"
+                  className="w-full px-4 py-3 rounded-2xl bg-[#05060B] border border-white/10 text-sm text-white focus:outline-hidden focus:border-orange-500 cursor-pointer"
                 >
                   <option value="">All Categories</option>
                   {categories.map((c) => (
@@ -264,7 +264,7 @@ export const WantedItemsView: React.FC<WantedItemsViewProps> = ({
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-1">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
                     Max Price ($)
                   </label>
                   <input
@@ -273,12 +273,12 @@ export const WantedItemsView: React.FC<WantedItemsViewProps> = ({
                     value={maxPrice}
                     onChange={(e) => setMaxPrice(e.target.value === '' ? '' : Number(e.target.value))}
                     placeholder="Leave empty for any"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-sm font-mono text-neutral-100 focus:outline-hidden focus:border-amber-500"
+                    className="w-full px-4 py-3 rounded-2xl bg-[#05060B] border border-white/10 text-sm font-mono text-white focus:outline-hidden focus:border-orange-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-neutral-400 mb-1">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
                     Radius (Miles)
                   </label>
                   <input
@@ -287,7 +287,7 @@ export const WantedItemsView: React.FC<WantedItemsViewProps> = ({
                     max={100}
                     value={radiusMiles}
                     onChange={(e) => setRadiusMiles(Number(e.target.value))}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-sm font-mono text-neutral-100 focus:outline-hidden focus:border-amber-500"
+                    className="w-full px-4 py-3 rounded-2xl bg-[#05060B] border border-white/10 text-sm font-mono text-white focus:outline-hidden focus:border-orange-500"
                   />
                 </div>
               </div>
@@ -296,14 +296,14 @@ export const WantedItemsView: React.FC<WantedItemsViewProps> = ({
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-neutral-400 hover:text-neutral-200"
+                  className="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-5 py-2 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 text-neutral-950 cursor-pointer disabled:opacity-50"
+                  className="px-6 py-2.5 rounded-2xl text-xs font-black bg-orange-500 hover:bg-orange-400 text-white cursor-pointer disabled:opacity-50 shadow-[0_0_20px_rgba(249,115,22,0.4)]"
                 >
                   {isSubmitting ? 'Saving...' : 'Activate Alert'}
                 </button>
