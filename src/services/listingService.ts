@@ -5,6 +5,12 @@ import { calculatePricingState } from '../utils/pricing';
 import { getAuthoritativeNow, syncServerTime } from '../utils/serverTime';
 import { storageService } from './storageService';
 
+export interface CreateListingProgress {
+  label: string;
+  currentStep: number;
+  totalSteps: number;
+}
+
 export interface ListingFilterParams {
   categoryId?: string;
   searchTerm?: string;
@@ -200,10 +206,25 @@ export const listingService = {
     };
   },
 
-  async createListing(sellerId: string, values: CreateListingFormValues): Promise<string> {
+  async createListing(
+    sellerId: string,
+    values: CreateListingFormValues,
+    onProgress?: (progress: CreateListingProgress) => void
+  ): Promise<string> {
     if (!isSupabaseConfigured) {
       throw new Error('Sign in with a configured Gonezy backend to post an item.');
     }
+
+    const photoCount = values.images?.length ?? 0;
+    const hasPriceSchedule = values.pricing_windows.length > 0;
+    const totalSteps = 1 + photoCount + (hasPriceSchedule ? 1 : 0);
+    let currentStep = 0;
+    const report = (label: string) => {
+      currentStep += 1;
+      onProgress?.({ label, currentStep, totalSteps });
+    };
+
+    report('Saving listing');
 
     const approximateLocation = fuzzLocation(values.pickup_latitude, values.pickup_longitude);
     const startTime = new Date(values.available_from || new Date());
@@ -246,8 +267,9 @@ export const listingService = {
 
     const listingId = listingData.id;
 
-    if (values.images && values.images.length > 0) {
-      for (let i = 0; i < values.images.length; i++) {
+    if (photoCount > 0) {
+      for (let i = 0; i < photoCount; i++) {
+        report(`Uploading photo ${i + 1} of ${photoCount}`);
         const file = values.images[i];
         const publicUrl = await storageService.uploadListingImage(file, listingId);
         const { error: imageError } = await supabase.from('listing_images').insert({
@@ -275,7 +297,8 @@ export const listingService = {
       return windowRecord;
     });
 
-    if (priceWindowsPayload.length > 0) {
+    if (hasPriceSchedule) {
+      report('Saving price schedule');
       const { error: windowError } = await supabase.from('listing_price_windows').insert(priceWindowsPayload);
       if (windowError) {
         throwLiveError(windowError, 'Listing was created but the price schedule failed to save');
