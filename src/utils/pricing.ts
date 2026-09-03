@@ -25,7 +25,8 @@ export function formatTimeRemaining(ms: number): string {
     return `${days}d ${remHours}h left`;
   }
   if (hours > 0) {
-    return `${hours}h ${minutes}m left`;
+    // Exactly 24h stays in this branch (hours > 24 is false) and should read "24h left".
+    return minutes > 0 ? `${hours}h ${minutes}m left` : `${hours}h left`;
   }
   if (minutes > 0) {
     return `${minutes}m ${seconds}s left`;
@@ -175,13 +176,22 @@ export function getPresetPricingSchedule(
   }
 }
 
-/** MVP default: free now, then a two-step price increase until the deadline. */
+/**
+ * MVP default: short FREE window, then $25, then $75 until the deadline.
+ * Free is capped at 30 minutes even on a 24h Gone-by so a long listing is
+ * not free for hours. Each paid window is at least 15 minutes.
+ */
 export function getStepUpPreset(deadlineHours: number): PricingWindowInput[] {
+  const FREE_WINDOW_CAP_MINUTES = 30;
+  const MIN_WINDOW_MINUTES = 15;
   const totalMins = Math.max(60, Math.round(deadlineHours * 60));
-  const freeMins = Math.min(30, Math.max(15, Math.floor(totalMins * 0.15)));
+  const freeMins = Math.min(
+    FREE_WINDOW_CAP_MINUTES,
+    Math.max(MIN_WINDOW_MINUTES, Math.floor(totalMins * 0.15))
+  );
   const remaining = totalMins - freeMins;
-  const midMins = Math.max(15, Math.floor(remaining * 0.5));
-  const lastMins = Math.max(15, remaining - midMins);
+  const midMins = Math.max(MIN_WINDOW_MINUTES, Math.floor(remaining * 0.5));
+  const lastMins = Math.max(MIN_WINDOW_MINUTES, remaining - midMins);
 
   return [
     { durationMinutes: freeMins, price: 0, label: `FREE for ${freeMins} min` },

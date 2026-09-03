@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>You're invited to Gonezy</title>
+  </head>
+  <body style="margin:0;padding:0;background:#05060B;color:#E2E8F0;font-family:Arial,Helvetica,sans-serif;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#05060B;padding:32px 12px;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:520px;background:#0A0C14;border:1px solid #1E2433;border-radius:24px;overflow:hidden;">
+            <tr>
+              <td style="padding:28px 28px 8px;border-bottom:1px solid #1E2433;">
+                <p style="margin:0;font-size:22px;font-weight:800;color:#FFFFFF;letter-spacing:-0.4px;">
+                  Gone<span style="color:#F97316;">zy</span>
+                </p>
+                <p style="margin:6px 0 0;font-size:12px;color:#94A3B8;">Make it gone. Easy.</p>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:28px;">
+                <h1 style="margin:0 0 12px;font-size:20px;line-height:1.3;color:#FFFFFF;">Your neighborhood just got faster</h1>
+                <p style="margin:0 0 16px;font-size:15px;line-height:1.55;color:#CBD5E1;">
+                  You are invited to Gonezy — the hyperlocal urgency marketplace. Sellers need it gone. Buyers who move first pay less.
+                </p>
+                <p style="margin:0 0 28px;">
+                  <a href="{{ .ConfirmationURL }}" style="display:inline-block;background:#F97316;color:#FFFFFF;text-decoration:none;font-weight:800;font-size:15px;padding:14px 22px;border-radius:14px;">
+                    Accept invite
+                  </a>
+                </p>
+                <p style="margin:0;font-size:13px;line-height:1.5;color:#64748B;">
+                  This invite is for {{ .Email }}. If it isn’t you, skip it.
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

@@ -326,7 +326,12 @@ export interface Database {
         Returns: number;
       };
       claim_listing: {
-        Args: { p_listing_id: string; p_buyer_id?: string };
+        Args: {
+          p_listing_id: string;
+          p_buyer_id?: string;
+          p_buyer_lat?: number | null;
+          p_buyer_lng?: number | null;
+        };
         Returns: {
           success: boolean;
           error?: string;

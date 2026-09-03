@@ -12,7 +12,7 @@ interface CreateListingFormProps {
   onCancel: () => void;
 }
 
-const DEADLINE_HOURS = [2, 4, 6, 12] as const;
+const DEADLINE_HOURS = [2, 6, 12, 24] as const;
 
 export const CreateListingForm: React.FC<CreateListingFormProps> = ({
   categories,
@@ -33,7 +33,7 @@ export const CreateListingForm: React.FC<CreateListingFormProps> = ({
   const [pickupLng, setPickupLng] = useState<number | null>(null);
   const [locationStatus, setLocationStatus] = useState<string | null>(null);
   const [locationStatusIsError, setLocationStatusIsError] = useState(false);
-  const [deadlineHours, setDeadlineHours] = useState<(typeof DEADLINE_HOURS)[number]>(4);
+  const [deadlineHours, setDeadlineHours] = useState<(typeof DEADLINE_HOURS)[number]>(12);
   const [categoryId, setCategoryId] = useState('');
 
   const pricingWindows = useMemo(() => getStepUpPreset(deadlineHours), [deadlineHours]);

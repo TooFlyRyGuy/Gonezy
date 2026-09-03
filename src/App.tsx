@@ -10,10 +10,11 @@ import { CreateListingForm } from './components/seller/CreateListingForm';
 import { ActivityView } from './components/activity/ActivityView';
 import { ProfileView } from './components/profile/ProfileView';
 import { AuthModal } from './components/auth/AuthModal';
+import { isResetPasswordLocation, ResetPasswordView } from './components/auth/ResetPasswordView';
 import { listingService } from './services/listingService';
 import { categoryService } from './services/categoryService';
 import { Category, ListingWithDetails, NavigationTab } from './types/marketplace';
-import { isPreviewMode } from './lib/supabase';
+import { isPreviewMode, supabase } from './lib/supabase';
 import { useUserLocation } from './hooks/useUserLocation';
 import { AlertTriangle, MapPin, RefreshCw, Search } from 'lucide-react';
 
@@ -353,6 +354,7 @@ function MarketplaceApp() {
       <ClaimModal
         listing={claimListingTarget}
         buyerId={user?.id || null}
+        buyerCoords={coords}
         onClose={() => setClaimListingTarget(null)}
         onSuccess={handleClaimSuccess}
       />
@@ -369,10 +371,39 @@ function MarketplaceApp() {
   );
 }
 
+function RootApp() {
+  const [showResetPassword, setShowResetPassword] = useState(() => isResetPasswordLocation());
+
+  useEffect(() => {
+    if (isResetPasswordLocation()) {
+      setShowResetPassword(true);
+    }
+    const { data } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        setShowResetPassword(true);
+      }
+    });
+    return () => data.subscription.unsubscribe();
+  }, []);
+
+  if (showResetPassword) {
+    return (
+      <ResetPasswordView
+        onDone={() => {
+          window.history.replaceState({}, '', '/');
+          setShowResetPassword(false);
+        }}
+      />
+    );
+  }
+
+  return <MarketplaceApp />;
+}
+
 export default function App() {
   return (
     <AuthProvider>
-      <MarketplaceApp />
+      <RootApp />
     </AuthProvider>
   );
 }

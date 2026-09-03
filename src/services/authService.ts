@@ -74,6 +74,13 @@ export const authService = {
     return data;
   },
 
+  async updatePassword(password: string) {
+    requireConfigured();
+    const { data, error } = await supabase.auth.updateUser({ password });
+    if (error) throwLiveError(error, 'Could not update password');
+    return data;
+  },
+
   async getSession() {
     if (!isSupabaseConfigured) return null;
     const { data, error } = await supabase.auth.getSession();

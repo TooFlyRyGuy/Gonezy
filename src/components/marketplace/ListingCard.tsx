@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ListingWithDetails } from '../../types/marketplace';
 import { calculatePricingState, formatCompactDuration, formatPrice } from '../../utils/pricing';
-import { formatDistance } from '../../utils/geo';
+import { formatDistanceWithDrive } from '../../utils/geo';
 import { getAuthoritativeNow } from '../../utils/serverTime';
 
 interface ListingCardProps {
@@ -26,10 +26,10 @@ export const ListingCard: React.FC<ListingCardProps> = ({ listing, onSelect, onQ
 
   const isClaimed = listing.status === 'claimed';
   const isPickedUp = listing.status === 'picked_up';
-  const distanceLabel = formatDistance(listing.calculated_distance_miles);
+  const distanceWithDrive = formatDistanceWithDrive(listing.calculated_distance_miles);
   const headline = pricing.isExpired
     ? 'EXPIRED'
-    : `${formatPrice(pricing.currentPrice)} for ${formatCompactDuration(pricing.timeRemainingMs)} · ${distanceLabel.replace(' away', '')}`;
+    : `${formatPrice(pricing.currentPrice)} for ${formatCompactDuration(pricing.timeRemainingMs)}`;
 
   return (
     <div
@@ -57,7 +57,12 @@ export const ListingCard: React.FC<ListingCardProps> = ({ listing, onSelect, onQ
                   : 'bg-orange-500 text-white shadow-[0_0_18px_rgba(249,115,22,0.45)]'
             }`}
           >
-            {headline}
+            <div>{headline}</div>
+            {!pricing.isExpired && distanceWithDrive ? (
+              <div className="mt-0.5 text-[11px] sm:text-xs font-bold font-sans tracking-normal opacity-90">
+                {distanceWithDrive}
+              </div>
+            ) : null}
           </div>
         </div>
 
@@ -87,8 +92,8 @@ export const ListingCard: React.FC<ListingCardProps> = ({ listing, onSelect, onQ
           ) : null}
         </div>
 
-        <div className="pt-3 border-t border-white/5 flex items-center justify-between gap-2">
-          <span className="text-xs text-slate-400 truncate">
+        <div className="pt-3 border-t border-white/5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
+          <span className="text-xs text-slate-400 truncate min-w-0">
             {listing.seller?.business_name || listing.seller?.display_name || 'Seller'}
           </span>
           {!isClaimed && !isPickedUp && !pricing.isExpired && (
@@ -98,7 +103,7 @@ export const ListingCard: React.FC<ListingCardProps> = ({ listing, onSelect, onQ
                 e.stopPropagation();
                 onQuickClaim(listing);
               }}
-              className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-orange-500 hover:bg-orange-400 text-white cursor-pointer"
+              className="w-full sm:w-auto min-h-[44px] px-5 rounded-xl text-sm font-bold bg-orange-500 hover:bg-orange-400 text-white cursor-pointer shrink-0"
             >
               Claim
             </button>

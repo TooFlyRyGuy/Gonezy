@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ListingWithDetails } from '../../types/marketplace';
 import { PriceScheduleTimeline } from '../common/PriceScheduleTimeline';
 import { calculatePricingState, formatCompactDuration, formatPrice } from '../../utils/pricing';
-import { formatDistance } from '../../utils/geo';
+import { formatDistance, formatDistanceWithDrive } from '../../utils/geo';
 import { getAuthoritativeNow } from '../../utils/serverTime';
 import { AlertCircle, CheckCircle2, ChevronLeft, ChevronRight, MapPin, Truck, X } from 'lucide-react';
 
@@ -49,6 +49,7 @@ export const ListingDetailModal: React.FC<ListingDetailModalProps> = ({
   const isClaimedByOther = listing.status === 'claimed' && !isClaimedByMe;
   const isExpired = pricing.isExpired || listing.status === 'expired';
   const showExactAddress = isSeller || isClaimedByMe;
+  const distanceWithDrive = formatDistanceWithDrive(listing.calculated_distance_miles);
 
   return (
     <div
@@ -67,9 +68,16 @@ export const ListingDetailModal: React.FC<ListingDetailModalProps> = ({
               pricing.isFree && !isExpired ? 'bg-green-500 text-white' : 'bg-orange-500 text-white'
             }`}
           >
-            {isExpired
-              ? 'EXPIRED'
-              : `${formatPrice(pricing.currentPrice)} for ${formatCompactDuration(pricing.timeRemainingMs)} · ${formatDistance(listing.calculated_distance_miles).replace(' away', '')}`}
+            <div>
+              {isExpired
+                ? 'EXPIRED'
+                : `${formatPrice(pricing.currentPrice)} for ${formatCompactDuration(pricing.timeRemainingMs)}`}
+            </div>
+            {!isExpired && distanceWithDrive ? (
+              <div className="mt-0.5 text-[11px] font-bold font-sans tracking-normal opacity-90">
+                {distanceWithDrive}
+              </div>
+            ) : null}
           </div>
           <button
             id="close-listing-detail-btn"
@@ -125,7 +133,7 @@ export const ListingDetailModal: React.FC<ListingDetailModalProps> = ({
             <p className="text-sm text-slate-200 font-semibold">
               {showExactAddress
                 ? listing.pickup_address_text
-                : `${formatDistance(listing.calculated_distance_miles)} — exact address unlocks after you claim`}
+                : `${distanceWithDrive || formatDistance(listing.calculated_distance_miles)} — exact address unlocks after you claim`}
             </p>
             {!showExactAddress && (
               <p className="text-[11px] text-slate-400 flex items-center gap-1">
@@ -142,24 +150,24 @@ export const ListingDetailModal: React.FC<ListingDetailModalProps> = ({
           </div>
         </div>
 
-        <div className="p-4 sm:p-5 border-t border-white/5 flex items-center justify-between gap-4">
+        <div className="p-4 sm:p-5 border-t border-white/5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
             <span className="text-[11px] text-slate-400">Lock this price</span>
             <div className="text-xl font-mono font-black text-orange-400">{formatPrice(pricing.currentPrice)}</div>
           </div>
           {isSeller ? (
-            <div className="px-4 py-2.5 rounded-xl bg-white/5 text-slate-300 text-xs font-bold">Your listing</div>
+            <div className="px-4 py-2.5 rounded-xl bg-white/5 text-slate-300 text-xs font-bold text-center">Your listing</div>
           ) : isClaimedByMe ? (
-            <div className="px-4 py-2.5 rounded-xl bg-green-500/20 text-green-300 text-xs font-bold">Claimed by you</div>
+            <div className="px-4 py-2.5 rounded-xl bg-green-500/20 text-green-300 text-xs font-bold text-center">Claimed by you</div>
           ) : isClaimedByOther ? (
-            <div className="px-4 py-2.5 rounded-xl bg-white/5 text-slate-400 text-xs font-bold">Already claimed</div>
+            <div className="px-4 py-2.5 rounded-xl bg-white/5 text-slate-400 text-xs font-bold text-center">Already claimed</div>
           ) : isExpired ? (
-            <div className="px-4 py-2.5 rounded-xl bg-white/5 text-slate-400 text-xs font-bold">Expired</div>
+            <div className="px-4 py-2.5 rounded-xl bg-white/5 text-slate-400 text-xs font-bold text-center">Expired</div>
           ) : (
             <button
               id="claim-listing-modal-btn"
               onClick={() => onClaim(listing)}
-              className="px-6 py-3.5 rounded-2xl text-sm font-black bg-orange-500 hover:bg-orange-400 text-white cursor-pointer flex items-center gap-2"
+              className="w-full sm:w-auto min-h-[44px] px-6 py-3.5 rounded-2xl text-sm font-black bg-orange-500 hover:bg-orange-400 text-white cursor-pointer flex items-center justify-center gap-2"
             >
               <Truck className="w-4 h-4" />
               Claim

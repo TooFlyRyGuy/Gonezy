@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ListingWithDetails } from '../../types/marketplace';
 import { formatPrice } from '../../utils/pricing';
+import { estimatePickupExpiry, formatDistanceWithDrive } from '../../utils/geo';
 import { claimService } from '../../services/claimService';
 import { listingService } from '../../services/listingService';
 import { AlertTriangle, CheckCircle2, Clock, MapPin, Truck, X } from 'lucide-react';
@@ -8,11 +9,18 @@ import { AlertTriangle, CheckCircle2, Clock, MapPin, Truck, X } from 'lucide-rea
 interface ClaimModalProps {
   listing: ListingWithDetails | null;
   buyerId: string | null;
+  buyerCoords?: { lat: number; lng: number } | null;
   onClose: () => void;
   onSuccess: () => void;
 }
 
-export const ClaimModal: React.FC<ClaimModalProps> = ({ listing, buyerId, onClose, onSuccess }) => {
+export const ClaimModal: React.FC<ClaimModalProps> = ({
+  listing,
+  buyerId,
+  buyerCoords,
+  onClose,
+  onSuccess,
+}) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [claimSuccessData, setClaimSuccessData] = useState<{
@@ -22,6 +30,10 @@ export const ClaimModal: React.FC<ClaimModalProps> = ({ listing, buyerId, onClos
   } | null>(null);
 
   if (!listing) return null;
+
+  const distanceWithDrive = formatDistanceWithDrive(listing.calculated_distance_miles);
+  const previewExpiry = estimatePickupExpiry(listing.calculated_distance_miles, listing.pickup_deadline);
+  const previewArriveBy = previewExpiry.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
   const handleConfirmClaim = async () => {
     if (!buyerId) {
@@ -33,7 +45,7 @@ export const ClaimModal: React.FC<ClaimModalProps> = ({ listing, buyerId, onClos
     setErrorMessage(null);
 
     try {
-      const result = await claimService.claimListing(listing.id, buyerId);
+      const result = await claimService.claimListing(listing.id, buyerId, buyerCoords);
       if (!result.success) {
         setErrorMessage(result.error || 'Could not complete claim.');
         setIsSubmitting(false);
@@ -131,7 +143,7 @@ export const ClaimModal: React.FC<ClaimModalProps> = ({ listing, buyerId, onClos
                 onSuccess();
                 onClose();
               }}
-              className="w-full py-3.5 rounded-2xl font-black text-sm bg-orange-500 hover:bg-orange-400 text-white cursor-pointer"
+              className="w-full min-h-[44px] py-3.5 rounded-2xl font-black text-sm bg-orange-500 hover:bg-orange-400 text-white cursor-pointer"
             >
               Go to Activity
             </button>
@@ -151,27 +163,41 @@ export const ClaimModal: React.FC<ClaimModalProps> = ({ listing, buyerId, onClos
               </div>
             </div>
 
+            <div className="p-4 rounded-2xl bg-[#05060B] border border-white/5 space-y-2">
+              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-orange-400">
+                <Clock className="w-4 h-4" />
+                Arrive by {previewArriveBy}
+              </div>
+              {distanceWithDrive ? (
+                <p className="text-xs text-slate-300">{distanceWithDrive}</p>
+              ) : null}
+              <p className="text-xs text-slate-400">
+                At least 2 hours, or your drive + 45 min if farther — never past the seller&apos;s Gone-by. You
+                don&apos;t pick a hold length.
+              </p>
+            </div>
+
             <p className="text-xs text-slate-400">
               You are committing to pick this up in the window. The locked price comes from the server clock, not your phone.
             </p>
 
-            <div className="flex items-center justify-end gap-3">
-              <button
-                type="button"
-                onClick={onClose}
-                disabled={isSubmitting}
-                className="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white cursor-pointer"
-              >
-                Cancel
-              </button>
+            <div className="flex flex-col gap-2">
               <button
                 id="confirm-claim-button"
                 onClick={handleConfirmClaim}
                 disabled={isSubmitting}
-                className="px-6 py-3.5 rounded-2xl text-sm font-black bg-orange-500 hover:bg-orange-400 text-white cursor-pointer disabled:opacity-50 flex items-center gap-2"
+                className="w-full min-h-[44px] px-6 py-3.5 rounded-2xl text-sm font-black bg-orange-500 hover:bg-orange-400 text-white cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 <Truck className="w-4 h-4" />
                 {isSubmitting ? 'Locking…' : `Confirm ${formatPrice(listing.current_price)}`}
+              </button>
+              <button
+                type="button"
+                onClick={onClose}
+                disabled={isSubmitting}
+                className="w-full py-2 text-xs font-medium text-slate-500 hover:text-slate-300 cursor-pointer disabled:opacity-50"
+              >
+                Cancel
               </button>
             </div>
           </div>
