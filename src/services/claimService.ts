@@ -27,15 +27,35 @@ function requireLive(): void {
 }
 
 export const claimService = {
-  async claimListing(listingId: string, buyerId: string): Promise<ClaimResult> {
+  async claimListing(
+    listingId: string,
+    buyerId: string,
+    buyerCoords?: { lat: number; lng: number } | null
+  ): Promise<ClaimResult> {
     if (isPreviewMode()) {
       return { success: false, error: 'Preview mode — sign in on a live backend to claim items.' };
     }
 
-    const { data, error } = await supabase.rpc('claim_listing', {
+    const baseArgs = {
       p_listing_id: listingId,
       p_buyer_id: buyerId,
-    });
+    };
+    const withCoords =
+      buyerCoords != null
+        ? { ...baseArgs, p_buyer_lat: buyerCoords.lat, p_buyer_lng: buyerCoords.lng }
+        : baseArgs;
+
+    let { data, error } = await supabase.rpc('claim_listing', withCoords);
+
+    // Old claim_listing(p_listing_id, p_buyer_id) still works if the travel-window
+    // migration has not been applied yet — retry without coords.
+    if (
+      error &&
+      buyerCoords != null &&
+      /could not find the function|schema cache|does not exist/i.test(error.message || '')
+    ) {
+      ({ data, error } = await supabase.rpc('claim_listing', baseArgs));
+    }
 
     if (error) {
       return { success: false, error: error.message || 'Could not claim this item' };

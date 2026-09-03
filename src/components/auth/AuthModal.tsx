@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { authService } from '../../services/authService';
 import { AccountType } from '../../types/database.types';
 import { X, Lock, Mail, User, Building2, AlertCircle, CheckCircle2, ArrowRight } from 'lucide-react';
 
@@ -53,8 +54,24 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         onSignedUp?.();
         onClose();
       } else if (mode === 'forgot') {
+        try {
+          await authService.resetPassword(email);
+        } catch (err: any) {
+          const msg = String(err?.message || '').toLowerCase();
+          // Do not reveal whether an account exists.
+          if (
+            msg.includes('user not found') ||
+            msg.includes('unable to find') ||
+            msg.includes('no user') ||
+            msg.includes('signups not allowed')
+          ) {
+            // Treat as success — generic copy below.
+          } else {
+            throw err;
+          }
+        }
         setSuccessMessage('Password reset link sent to ' + email);
-        setTimeout(() => setMode('signin'), 2000);
+        setTimeout(() => setMode('signin'), 2500);
       }
     } catch (err: any) {
       setErrorMessage(err.message || 'Authentication failed. Please check your credentials.');

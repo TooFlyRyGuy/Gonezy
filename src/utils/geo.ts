@@ -46,13 +46,81 @@ export function calculateDistanceMiles(
  * Formats distance in a clean human-readable badge (e.g., "1.2 mi away")
  */
 export function formatDistance(miles: number | null | undefined): string {
-  if (miles === null || miles === undefined || isNaN(miles)) {
+  if (!hasMeasuredDistance(miles)) {
     return 'Nearby';
   }
   if (miles < 0.2) {
     return '< 0.2 mi away';
   }
   return `${miles.toFixed(1)} mi away`;
+}
+
+/**
+ * Effective local driving average used for pickup-window and travel-time estimates.
+ * Straight-line miles / this speed — not a maps API, not live traffic.
+ */
+export const EFFECTIVE_LOCAL_DRIVE_MPH = 28;
+
+/** Slack added on top of estimated drive so buyers can park and load. */
+export const PICKUP_SLACK_MINUTES = 45;
+
+/** Nearby buyers always get at least this long, unless the listing deadline is sooner. */
+export const MIN_PICKUP_WINDOW_MINUTES = 120;
+
+export function hasMeasuredDistance(miles: number | null | undefined): miles is number {
+  return miles !== null && miles !== undefined && !Number.isNaN(miles);
+}
+
+/**
+ * Estimated one-way drive minutes from straight-line miles at EFFECTIVE_LOCAL_DRIVE_MPH.
+ * Returns null when distance is unknown so we never fabricate a time.
+ */
+export function estimateDriveMinutes(miles: number | null | undefined): number | null {
+  if (!hasMeasuredDistance(miles) || miles < 0) return null;
+  return Math.max(1, Math.round((miles / EFFECTIVE_LOCAL_DRIVE_MPH) * 60));
+}
+
+/** Compact travel label, e.g. "~12 min drive". Null when distance is unknown. */
+export function formatDriveTime(miles: number | null | undefined): string | null {
+  const minutes = estimateDriveMinutes(miles);
+  if (minutes == null) return null;
+  if (minutes < 60) return `~${minutes} min drive`;
+  const hours = Math.floor(minutes / 60);
+  const rem = minutes % 60;
+  if (rem === 0) return `~${hours}h drive`;
+  return `~${hours}h ${rem}m drive`;
+}
+
+/**
+ * Distance plus drive time for cards/detail/claim.
+ * Returns null when the user has not shared location (do not invent a time).
+ */
+export function formatDistanceWithDrive(miles: number | null | undefined): string | null {
+  if (!hasMeasuredDistance(miles)) return null;
+  const distance = formatDistance(miles).replace(' away', '');
+  const drive = formatDriveTime(miles);
+  return drive ? `${distance} · ${drive}` : distance;
+}
+
+/**
+ * Pickup hold length in minutes: max(2 hours, drive + 45 min).
+ * Without a measured distance this degrades to the 2-hour floor.
+ */
+export function estimatePickupWindowMinutes(miles: number | null | undefined): number {
+  const drive = estimateDriveMinutes(miles);
+  if (drive == null) return MIN_PICKUP_WINDOW_MINUTES;
+  return Math.max(MIN_PICKUP_WINDOW_MINUTES, drive + PICKUP_SLACK_MINUTES);
+}
+
+/** Arrive-by instant: the pickup window, never past the listing deadline. */
+export function estimatePickupExpiry(
+  miles: number | null | undefined,
+  listingDeadlineIso: string,
+  now: Date = new Date()
+): Date {
+  const uncapped = now.getTime() + estimatePickupWindowMinutes(miles) * 60_000;
+  const deadline = new Date(listingDeadlineIso).getTime();
+  return new Date(Math.min(uncapped, deadline));
 }
 
 const NOMINATIM_REVERSE_URL = 'https://nominatim.openstreetmap.org/reverse';
