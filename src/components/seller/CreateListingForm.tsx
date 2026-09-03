@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Category, CreateListingFormValues } from '../../types/marketplace';
 import { formatPrice, getStepUpPreset } from '../../utils/pricing';
-import { listingService } from '../../services/listingService';
+import { CreateListingProgress, listingService } from '../../services/listingService';
 import { reverseGeocodeAddress } from '../../utils/geo';
 import { AlertCircle, Camera, CheckCircle2, Clock, MapPin, Trash2, Upload } from 'lucide-react';
 
@@ -21,6 +21,7 @@ export const CreateListingForm: React.FC<CreateListingFormProps> = ({
   onCancel,
 }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [publishProgress, setPublishProgress] = useState<CreateListingProgress | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const [photos, setPhotos] = useState<File[]>([]);
@@ -97,6 +98,7 @@ export const CreateListingForm: React.FC<CreateListingFormProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setPublishProgress(null);
     setErrorMessage(null);
 
     try {
@@ -118,9 +120,10 @@ export const CreateListingForm: React.FC<CreateListingFormProps> = ({
         images: photos,
       };
 
-      const newId = await listingService.createListing(sellerId, formValues);
+      const newId = await listingService.createListing(sellerId, formValues, setPublishProgress);
       onSuccess(newId);
     } catch (err: any) {
+      setPublishProgress(null);
       setErrorMessage(err.message || 'Could not publish listing');
     } finally {
       setIsSubmitting(false);
@@ -131,8 +134,10 @@ export const CreateListingForm: React.FC<CreateListingFormProps> = ({
     <form
       id="create-listing-form"
       onSubmit={handleSubmit}
-      className="w-full max-w-xl mx-auto bg-[#0A0C14] border border-white/5 rounded-3xl p-5 sm:p-7 shadow-2xl space-y-5"
+      aria-busy={isSubmitting}
+      className="w-full max-w-xl mx-auto bg-[#0A0C14] border border-white/5 rounded-3xl p-5 sm:p-7 shadow-2xl"
     >
+      <fieldset disabled={isSubmitting} className="m-0 min-w-0 space-y-5 border-0 p-0">
       <div className="flex items-start justify-between gap-3 border-b border-white/5 pb-4">
         <div>
           <h2 className="text-xl font-black text-white">Post an item</h2>
@@ -141,7 +146,8 @@ export const CreateListingForm: React.FC<CreateListingFormProps> = ({
         <button
           type="button"
           onClick={onCancel}
-          className="text-xs font-bold text-slate-400 hover:text-white px-3.5 py-2 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/5 cursor-pointer"
+          disabled={isSubmitting}
+          className="text-xs font-bold text-slate-400 hover:text-white px-3.5 py-2 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Cancel
         </button>
@@ -309,14 +315,38 @@ export const CreateListingForm: React.FC<CreateListingFormProps> = ({
         </div>
       )}
 
+      {isSubmitting && publishProgress && (
+        <div className="space-y-2" aria-live="polite">
+          <div className="flex items-center justify-between gap-3 text-xs">
+            <span className="font-bold text-orange-300">{publishProgress.label}</span>
+            <span className="font-mono text-slate-400 shrink-0">
+              {publishProgress.currentStep}/{publishProgress.totalSteps}
+            </span>
+          </div>
+          <div className="h-2 rounded-full bg-white/10 overflow-hidden">
+            <div
+              className="h-full rounded-full bg-orange-500 transition-[width] duration-300"
+              style={{
+                width: `${Math.round((publishProgress.currentStep / publishProgress.totalSteps) * 100)}%`,
+              }}
+              role="progressbar"
+              aria-valuemin={0}
+              aria-valuemax={publishProgress.totalSteps}
+              aria-valuenow={publishProgress.currentStep}
+              aria-valuetext={publishProgress.label}
+            />
+          </div>
+        </div>
+      )}
+
       <button
         type="submit"
         id="publish-listing-btn"
         disabled={isSubmitting}
-        className="w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl text-sm font-black bg-orange-500 hover:bg-orange-400 text-white cursor-pointer disabled:opacity-50"
+        className="w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl text-sm font-black bg-orange-500 hover:bg-orange-400 text-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {isSubmitting ? (
-          'Publishing…'
+          publishProgress?.label ?? 'Publishing…'
         ) : (
           <>
             <CheckCircle2 className="w-4 h-4" />
@@ -324,6 +354,7 @@ export const CreateListingForm: React.FC<CreateListingFormProps> = ({
           </>
         )}
       </button>
+      </fieldset>
     </form>
   );
 };
