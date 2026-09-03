@@ -8,7 +8,13 @@ export type ListingPriceWindow = Database['public']['Tables']['listing_price_win
 export type BuyerInterest = Database['public']['Tables']['buyer_interests']['Row'];
 export type Claim = Database['public']['Tables']['claims']['Row'];
 
-export interface ListingWithDetails extends Listing {
+export interface ListingWithDetails extends Omit<
+  Listing,
+  'pickup_address_text' | 'pickup_latitude' | 'pickup_longitude'
+> {
+  pickup_address_text: string | null;
+  pickup_latitude: number | null;
+  pickup_longitude: number | null;
   category?: Category | null;
   images: ListingImage[];
   price_windows: ListingPriceWindow[];
@@ -25,17 +31,15 @@ export interface PricingWindowInput {
 
 export interface CreateListingFormValues {
   title: string;
-  description: string;
-  category_id: string;
-  condition: ItemCondition;
-  estimated_value: number;
+  description?: string;
+  category_id?: string;
+  condition?: ItemCondition;
   pickup_address_text: string;
   pickup_latitude: number;
   pickup_longitude: number;
-  available_from: string;
+  available_from?: string;
   pricing_windows: PricingWindowInput[];
   images: File[];
-  image_urls?: string[]; // for preview or pre-uploaded
 }
 
 export interface UserAuthSession {
@@ -64,4 +68,4 @@ export interface PricingState {
   progressPercent: number; // 0-100 progress within current window
 }
 
-export type NavigationTab = 'explore' | 'wanted' | 'sell' | 'activity' | 'profile';
+export type NavigationTab = 'explore' | 'sell' | 'activity' | 'profile';
