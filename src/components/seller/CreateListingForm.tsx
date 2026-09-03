@@ -2,7 +2,8 @@ import React, { useMemo, useState } from 'react';
 import { Category, CreateListingFormValues } from '../../types/marketplace';
 import { formatPrice, getStepUpPreset } from '../../utils/pricing';
 import { listingService } from '../../services/listingService';
-import { AlertCircle, CheckCircle2, Clock, MapPin, Trash2, Upload } from 'lucide-react';
+import { reverseGeocodeAddress } from '../../utils/geo';
+import { AlertCircle, Camera, CheckCircle2, Clock, MapPin, Trash2, Upload } from 'lucide-react';
 
 interface CreateListingFormProps {
   categories: Category[];
@@ -25,10 +26,12 @@ export const CreateListingForm: React.FC<CreateListingFormProps> = ({
   const [photos, setPhotos] = useState<File[]>([]);
   const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
   const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
   const [pickupAddress, setPickupAddress] = useState('');
   const [pickupLat, setPickupLat] = useState<number | null>(null);
   const [pickupLng, setPickupLng] = useState<number | null>(null);
   const [locationStatus, setLocationStatus] = useState<string | null>(null);
+  const [locationStatusIsError, setLocationStatusIsError] = useState(false);
   const [deadlineHours, setDeadlineHours] = useState<(typeof DEADLINE_HOURS)[number]>(4);
   const [categoryId, setCategoryId] = useState('');
 
@@ -40,6 +43,7 @@ export const CreateListingForm: React.FC<CreateListingFormProps> = ({
     setPhotos((prev) => [...prev, ...newFiles].slice(0, 4));
     const newPreviews = newFiles.map((file) => URL.createObjectURL(file as Blob));
     setPhotoPreviews((prev) => [...prev, ...newPreviews].slice(0, 4));
+    e.target.value = '';
   };
 
   const removePhoto = (index: number) => {
@@ -49,18 +53,42 @@ export const CreateListingForm: React.FC<CreateListingFormProps> = ({
 
   const useCurrentLocation = () => {
     if (!navigator.geolocation) {
-      setLocationStatus('This browser cannot share location.');
+      setLocationStatusIsError(true);
+      setLocationStatus('This browser cannot share location. Type the pickup address.');
       return;
     }
+    setLocationStatusIsError(false);
     setLocationStatus('Finding your location…');
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setPickupLat(pos.coords.latitude);
-        setPickupLng(pos.coords.longitude);
-        setLocationStatus('Location set. Buyers see distance only — not this pin.');
+      async (pos) => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        setPickupLat(lat);
+        setPickupLng(lng);
+        setLocationStatusIsError(false);
+        setLocationStatus('Looking up that address…');
+        try {
+          const address = await reverseGeocodeAddress(lat, lng);
+          if (address) {
+            setPickupAddress(address);
+            setLocationStatusIsError(false);
+            setLocationStatus('Location set. Buyers see distance only — not this pin.');
+          } else {
+            setLocationStatusIsError(true);
+            setLocationStatus('Pin set, but no street address came back. Type the pickup address.');
+          }
+        } catch {
+          setLocationStatusIsError(true);
+          setLocationStatus('Could not look up that address. Type the pickup address.');
+        }
       },
-      () => {
-        setLocationStatus('Could not read location. Allow location access and try again.');
+      (err) => {
+        setLocationStatusIsError(true);
+        setLocationStatus(
+          err.code === err.PERMISSION_DENIED
+            ? 'Location permission was denied. Allow location access or type the pickup address.'
+            : 'Could not read location. Allow location access and try again.'
+        );
       },
       { enableHighAccuracy: false, timeout: 12000 }
     );
@@ -80,6 +108,7 @@ export const CreateListingForm: React.FC<CreateListingFormProps> = ({
 
       const formValues: CreateListingFormValues = {
         title: title.trim(),
+        description: description.trim() || undefined,
         pickup_address_text: pickupAddress.trim(),
         pickup_latitude: pickupLat,
         pickup_longitude: pickupLng,
@@ -127,13 +156,36 @@ export const CreateListingForm: React.FC<CreateListingFormProps> = ({
 
       <div className="space-y-3">
         <label className="block text-xs font-bold uppercase tracking-wider text-slate-400">Photo</label>
-        <div className="border-2 border-dashed border-white/10 hover:border-orange-500/60 rounded-3xl p-5 text-center bg-[#05060B]">
-          <input type="file" id="photo-upload-input" accept="image/*" capture="environment" onChange={handlePhotoUpload} className="hidden" />
+        <div className="border-2 border-dashed border-white/10 hover:border-orange-500/60 rounded-3xl p-5 text-center bg-[#05060B] space-y-3">
+          <input
+            type="file"
+            id="photo-upload-input"
+            accept="image/*"
+            multiple
+            onChange={handlePhotoUpload}
+            className="hidden"
+          />
+          <input
+            type="file"
+            id="photo-capture-input"
+            accept="image/*"
+            capture="environment"
+            onChange={handlePhotoUpload}
+            className="hidden"
+          />
           <label htmlFor="photo-upload-input" className="flex flex-col items-center cursor-pointer space-y-2">
             <div className="p-3 rounded-2xl bg-orange-500/15 text-orange-400 border border-orange-500/30">
               <Upload className="w-5 h-5" />
             </div>
-            <span className="text-sm font-bold text-white">Take or upload a photo</span>
+            <span className="text-sm font-bold text-white">Choose from library</span>
+            <span className="text-xs text-slate-400">Upload a photo from your camera roll</span>
+          </label>
+          <label
+            htmlFor="photo-capture-input"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-white/5 hover:bg-white/10 text-slate-200 border border-white/10 cursor-pointer"
+          >
+            <Camera className="w-3.5 h-3.5 text-orange-400" />
+            Take photo
           </label>
         </div>
         {photoPreviews.length > 0 && (
@@ -167,6 +219,20 @@ export const CreateListingForm: React.FC<CreateListingFormProps> = ({
       </div>
 
       <div>
+        <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+          Description <span className="normal-case font-medium text-slate-500">(optional)</span>
+        </label>
+        <textarea
+          id="listing-description-input"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          rows={3}
+          placeholder="Runs, you haul, garage level."
+          className="w-full px-4 py-3 rounded-2xl bg-[#05060B] border border-white/10 text-white placeholder-slate-500 focus:outline-hidden focus:border-orange-500 text-sm resize-none"
+        />
+      </div>
+
+      <div>
         <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Pickup address</label>
         <input
           id="listing-pickup-address-input"
@@ -185,7 +251,11 @@ export const CreateListingForm: React.FC<CreateListingFormProps> = ({
           <MapPin className="w-3.5 h-3.5 text-orange-400" />
           Use my current location
         </button>
-        {locationStatus && <p className="mt-2 text-xs text-slate-300">{locationStatus}</p>}
+        {locationStatus && (
+          <p className={`mt-2 text-xs ${locationStatusIsError ? 'text-red-300' : 'text-slate-300'}`}>
+            {locationStatus}
+          </p>
+        )}
       </div>
 
       <div>

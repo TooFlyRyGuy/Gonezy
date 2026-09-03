@@ -7,12 +7,14 @@ interface AuthModalProps {
   isOpen: boolean;
   initialMode?: 'signin' | 'signup';
   onClose: () => void;
+  onSignedUp?: () => void;
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({
   isOpen,
   initialMode = 'signin',
   onClose,
+  onSignedUp,
 }) => {
   const { signIn, signUp } = useAuth();
   const [mode, setMode] = useState<'signin' | 'signup' | 'forgot'>(initialMode);
@@ -44,12 +46,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         await signUp({
           email,
           password,
-          displayName,
+          displayName: displayName.trim(),
           accountType,
           businessName: accountType === 'business' ? businessName : undefined,
         });
-        setSuccessMessage('Account registered! Please check your email or log in.');
-        setTimeout(() => onClose(), 1500);
+        onSignedUp?.();
+        onClose();
       } else if (mode === 'forgot') {
         setSuccessMessage('Password reset link sent to ' + email);
         setTimeout(() => setMode('signin'), 2000);

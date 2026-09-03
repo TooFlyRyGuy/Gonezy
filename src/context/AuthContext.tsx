@@ -116,6 +116,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const data = await authService.signUp(params);
       if (data?.user) {
         setUser(data.user);
+        const prof = await profileService.ensureProfile(data.user.id, {
+          displayName: params.displayName.trim(),
+          accountType: params.accountType,
+          firstName: params.firstName,
+          lastName: params.lastName,
+          businessName: params.businessName,
+        });
+        setProfile(prof);
       }
     } catch (err: any) {
       setAuthError(err.message || 'Sign up failed');

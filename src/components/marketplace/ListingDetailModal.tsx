@@ -108,9 +108,9 @@ export const ListingDetailModal: React.FC<ListingDetailModalProps> = ({
 
           <div>
             <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight">{listing.title}</h1>
-            <p className="mt-2 text-sm text-slate-300 leading-relaxed">
-              {listing.description || 'Available for pickup now.'}
-            </p>
+            {listing.description?.trim() ? (
+              <p className="mt-2 text-sm text-slate-300 leading-relaxed">{listing.description.trim()}</p>
+            ) : null}
           </div>
 
           <div className="p-5 rounded-3xl bg-[#05060B] border border-white/5">

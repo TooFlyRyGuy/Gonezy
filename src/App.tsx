@@ -357,7 +357,14 @@ function MarketplaceApp() {
         onSuccess={handleClaimSuccess}
       />
 
-      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        onSignedUp={() => {
+          setIsAuthModalOpen(false);
+          setCurrentTab('profile');
+        }}
+      />
     </div>
   );
 }

@@ -78,9 +78,14 @@ export const ListingCard: React.FC<ListingCardProps> = ({ listing, onSelect, onQ
       </div>
 
       <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
-        <h3 className="text-base font-bold text-white line-clamp-2 group-hover:text-orange-400">
-          {listing.title}
-        </h3>
+        <div className="space-y-1.5">
+          <h3 className="text-base font-bold text-white line-clamp-2 group-hover:text-orange-400">
+            {listing.title}
+          </h3>
+          {listing.description?.trim() ? (
+            <p className="text-xs text-slate-400 line-clamp-1">{listing.description.trim()}</p>
+          ) : null}
+        </div>
 
         <div className="pt-3 border-t border-white/5 flex items-center justify-between gap-2">
           <span className="text-xs text-slate-400 truncate">

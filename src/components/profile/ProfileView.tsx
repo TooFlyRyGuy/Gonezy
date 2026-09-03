@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { AccountType, BusinessType } from '../../types/database.types';
 import { Building2, CheckCircle2, LogOut, User } from 'lucide-react';
@@ -14,6 +14,15 @@ export const ProfileView: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!profile) return;
+    setDisplayName(profile.display_name?.trim() || user?.user_metadata?.display_name || '');
+    setPhone(profile.phone || '');
+    setAccountType(profile.account_type || 'consumer');
+    setBusinessName(profile.business_name || '');
+    setBusinessType(profile.business_type || '');
+  }, [profile, user?.user_metadata?.display_name]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
