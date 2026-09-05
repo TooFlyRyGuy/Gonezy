@@ -22,3 +22,5 @@ Do not change the `{{ .ConfirmationURL }}` (or other) variables. Supabase Auth f
 ## Voice
 
 Fast, clever, simple, useful, local, energetic, trustworthy. Brand promise: **Make it gone. Easy.** Orange `#F97316` on dark, matching the app.
+
+New-listing buyer mail is not an Auth template. It is sent by the `notify-new-drop` Edge Function via the Resend API. See `supabase/functions/notify-new-drop/README.md`.

@@ -1,0 +1,8 @@
+# Minimal project config. Per-function JWT rules live here.
+project_id = "gonezy"
+
+# Called by a database trigger (pg_net) and as a backup from the
+# browser after publish. Auth is "listing exists + one-send lock",
+# not a user JWT — see supabase/functions/notify-new-drop/README.md.
+[functions.notify-new-drop]
+verify_jwt = false
