@@ -38,7 +38,9 @@ Do **not** put `RESEND_API_KEY` in Vercel. `VITE_SUPABASE_URL` / `VITE_SUPABASE_
 
 ## Deploy
 
-After merging (or to test this branch):
+The migration (`notify_new_drop`) and Edge Function are already applied on live project `evtgtzgrnvzjnrkmnwcx`. New publishes will hit the function immediately; without `RESEND_API_KEY` they no-op. Deep links (`/listing/<id>`) ship with this PR’s Vercel deploy.
+
+To redeploy after a code change:
 
 ```bash
 npx supabase db push --project-ref evtgtzgrnvzjnrkmnwcx
