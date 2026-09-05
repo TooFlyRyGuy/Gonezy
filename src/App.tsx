@@ -16,6 +16,7 @@ import { categoryService } from './services/categoryService';
 import { Category, ListingWithDetails, NavigationTab } from './types/marketplace';
 import { isPreviewMode, supabase } from './lib/supabase';
 import { useUserLocation } from './hooks/useUserLocation';
+import { listingPath, parseListingDeepLink } from './utils/listingDeepLink';
 import { AlertTriangle, MapPin, RefreshCw, Search } from 'lucide-react';
 
 function SignInGate({
@@ -128,9 +129,49 @@ function MarketplaceApp() {
     setCurrentTab(tab);
   };
 
+  const openListing = (listing: ListingWithDetails) => {
+    setSelectedListing(listing);
+    if (window.location.pathname !== listingPath(listing.id)) {
+      window.history.pushState({ listingId: listing.id }, '', listingPath(listing.id));
+    }
+  };
+
+  const closeListing = () => {
+    setSelectedListing(null);
+    if (parseListingDeepLink(window.location)) {
+      window.history.pushState({}, '', '/');
+    }
+  };
+
   const handleQuickClaim = (listing: ListingWithDetails) => {
     requireAuth(() => setClaimListingTarget(listing));
   };
+
+  useEffect(() => {
+    const openFromLocation = async () => {
+      const listingId = parseListingDeepLink(window.location);
+      if (!listingId) {
+        setSelectedListing(null);
+        return;
+      }
+      try {
+        const item = await listingService.getListingById(listingId);
+        if (item) {
+          setSelectedListing(item);
+          setCurrentTab('explore');
+        }
+      } catch {
+        // Keep the feed usable if a stale email link 404s.
+      }
+    };
+
+    void openFromLocation();
+    const onPopState = () => {
+      void openFromLocation();
+    };
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
 
   const handleClaimSuccess = () => {
     loadData();
@@ -288,7 +329,7 @@ function MarketplaceApp() {
                   <ListingCard
                     key={listing.id}
                     listing={listing}
-                    onSelect={setSelectedListing}
+                    onSelect={openListing}
                     onQuickClaim={handleQuickClaim}
                   />
                 ))}
@@ -318,7 +359,7 @@ function MarketplaceApp() {
 
         {currentTab === 'activity' &&
           (user ? (
-            <ActivityView userId={user.id} onSelectListing={setSelectedListing} />
+            <ActivityView userId={user.id} onSelectListing={openListing} />
           ) : (
             <SignInGate
               title="Sign in to see activity"
@@ -344,9 +385,9 @@ function MarketplaceApp() {
       <ListingDetailModal
         listing={selectedListing}
         currentUserId={user?.id}
-        onClose={() => setSelectedListing(null)}
+        onClose={closeListing}
         onClaim={(item) => {
-          setSelectedListing(null);
+          closeListing();
           handleQuickClaim(item);
         }}
       />

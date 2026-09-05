@@ -136,6 +136,7 @@ export interface Database {
           current_price: number;
           original_price: number;
           is_free: boolean;
+          drop_email_sent_at: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -158,6 +159,7 @@ export interface Database {
           current_price?: number;
           original_price?: number;
           is_free?: boolean;
+          drop_email_sent_at?: string | null;
           created_at?: string;
           updated_at?: string;
         };

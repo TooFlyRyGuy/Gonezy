@@ -305,6 +305,17 @@ export const listingService = {
       }
     }
 
+    // Backup if the DB trigger/pg_net call is missing. The Edge Function
+    // no-ops when drop_email_sent_at is already set, so this cannot double-send.
+    void supabase.functions
+      .invoke('notify-new-drop', { body: { listing_id: listingId } })
+      .then(({ error }) => {
+        if (error) console.warn('New-drop email notify failed', error.message);
+      })
+      .catch((err: unknown) => {
+        console.warn('New-drop email notify failed', err);
+      });
+
     return listingId;
   },
 
@@ -350,6 +361,7 @@ function getPreviewListings(filters: ListingFilterParams = {}): ListingWithDetai
       current_price: 0,
       original_price: 75,
       is_free: true,
+      drop_email_sent_at: null,
       created_at: new Date(now - 10 * 60 * 1000).toISOString(),
       updated_at: new Date(now - 10 * 60 * 1000).toISOString(),
       calculated_distance_miles: 1.4,
@@ -418,6 +430,7 @@ function getPreviewListings(filters: ListingFilterParams = {}): ListingWithDetai
       current_price: 25,
       original_price: 75,
       is_free: false,
+      drop_email_sent_at: null,
       created_at: new Date(now - 45 * 60 * 1000).toISOString(),
       updated_at: new Date(now - 45 * 60 * 1000).toISOString(),
       calculated_distance_miles: 2.8,
