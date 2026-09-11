@@ -6,6 +6,9 @@ export type Listing = Database['public']['Tables']['listings']['Row'];
 export type ListingImage = Database['public']['Tables']['listing_images']['Row'];
 export type ListingPriceWindow = Database['public']['Tables']['listing_price_windows']['Row'];
 export type BuyerInterest = Database['public']['Tables']['buyer_interests']['Row'];
+export type ProfilePickupPrefs = Database['public']['Tables']['profile_pickup_prefs']['Row'];
+export type ProfileInterestCategory = Database['public']['Tables']['profile_interest_categories']['Row'];
+export type DropEmailMode = ProfilePickupPrefs['drop_email_mode'];
 export type Claim = Database['public']['Tables']['claims']['Row'];
 
 export interface ListingWithDetails extends Omit<

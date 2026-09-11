@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { AccountType, BusinessType } from '../../types/database.types';
 import { Building2, CheckCircle2, LogOut, User } from 'lucide-react';
+import { PickupInterestsCard } from './PickupInterestsCard';
 
 export const ProfileView: React.FC = () => {
   const { user, profile, updateProfile, signOut } = useAuth();
@@ -166,6 +167,8 @@ export const ProfileView: React.FC = () => {
           </button>
         </div>
       </form>
+
+      {accountType === 'consumer' && user && <PickupInterestsCard userId={user.id} />}
     </div>
   );
 };

@@ -8,7 +8,7 @@ interface AuthModalProps {
   isOpen: boolean;
   initialMode?: 'signin' | 'signup';
   onClose: () => void;
-  onSignedUp?: () => void;
+  onSignedUp?: (info: { accountType: AccountType }) => void;
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({
@@ -51,7 +51,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           accountType,
           businessName: accountType === 'business' ? businessName : undefined,
         });
-        onSignedUp?.();
+        onSignedUp?.({ accountType });
         onClose();
       } else if (mode === 'forgot') {
         try {
