@@ -50,7 +50,7 @@ export const ProfileView: React.FC = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <div className="max-w-2xl mx-auto space-y-6 pb-8">
       <div className="p-6 rounded-3xl bg-[#0A0C14] border border-white/5 space-y-5">
         <div className="flex items-center justify-between">
           <div>

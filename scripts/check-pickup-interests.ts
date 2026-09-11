@@ -180,4 +180,26 @@ assert.doesNotMatch(edge, /VITE_RESEND/);
 const clientLib = readFileSync(join(root, 'src/lib/supabase.ts'), 'utf8');
 assert.doesNotMatch(clientLib, /SERVICE_ROLE/);
 
+const categorySource = readFileSync(join(root, 'src/services/categoryService.ts'), 'utf8');
+for (const name of [
+  'Furniture',
+  'Appliances',
+  'Electronics',
+  'Tools',
+  'Building Materials',
+  'Outdoor / Patio',
+  'Landscaping / Garden',
+  'Automotive',
+  'Commercial Equipment',
+  'Restaurant Equipment',
+  'Office Furniture',
+  'Home Goods',
+  'Collectibles',
+  'Scrap / Materials',
+  'Other',
+]) {
+  assert.match(categorySource, new RegExp(`name: '${name}'`));
+}
+assert.doesNotMatch(categorySource, /Tools & Hardware|Home Goods & Decor|Other Rapid Removal/);
+
 console.log('pickup interest checks passed');

@@ -143,7 +143,7 @@ export const PickupInterestsCard: React.FC<PickupInterestsCardProps> = ({
       {isLoading ? (
         <div className="text-xs text-slate-400">Loading categories…</div>
       ) : (
-        <div className="flex flex-wrap gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
           {categories.map((cat) => {
             const Icon = ICON_MAP[cat.icon_name] || Box;
             const selected = categoryIds.includes(cat.id);
@@ -153,14 +153,14 @@ export const PickupInterestsCard: React.FC<PickupInterestsCardProps> = ({
                 type="button"
                 id={`pickup-interest-${cat.slug}`}
                 onClick={() => toggleCategory(cat.id)}
-                className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-bold whitespace-nowrap cursor-pointer ${
+                className={`flex items-center justify-center gap-1.5 px-2.5 py-2.5 rounded-2xl text-[11px] sm:text-xs font-bold leading-tight text-center cursor-pointer ${
                   selected
                     ? 'bg-orange-500 text-white shadow-[0_0_15px_rgba(249,115,22,0.4)]'
                     : 'bg-white/5 hover:bg-white/10 text-slate-300 border border-white/5'
                 }`}
               >
-                <Icon className="w-3.5 h-3.5" />
-                {cat.name}
+                <Icon className="w-3.5 h-3.5 shrink-0" />
+                <span>{cat.name}</span>
               </button>
             );
           })}
@@ -239,7 +239,7 @@ export const PickupInterestsCard: React.FC<PickupInterestsCardProps> = ({
         </div>
       )}
 
-      <div className={`flex ${isSignup ? 'justify-between' : 'justify-end'} gap-2`}>
+      <div className={`flex ${isSignup ? 'justify-between' : 'justify-end'} gap-2 pb-2 sm:pb-0`}>
         {isSignup && (
           <button
             type="button"
