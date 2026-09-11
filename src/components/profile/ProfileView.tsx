@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { AccountType, BusinessType } from '../../types/database.types';
 import { Building2, CheckCircle2, LogOut, User } from 'lucide-react';
+import { PickupInterestsCard } from './PickupInterestsCard';
+import { isPreviewMode } from '../../lib/supabase';
 
 export const ProfileView: React.FC = () => {
   const { user, profile, updateProfile, signOut } = useAuth();
@@ -48,7 +50,7 @@ export const ProfileView: React.FC = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <div className="max-w-2xl mx-auto space-y-6 pb-8">
       <div className="p-6 rounded-3xl bg-[#0A0C14] border border-white/5 space-y-5">
         <div className="flex items-center justify-between">
           <div>
@@ -166,6 +168,10 @@ export const ProfileView: React.FC = () => {
           </button>
         </div>
       </form>
+
+      {accountType === 'consumer' && (user || isPreviewMode()) && (
+        <PickupInterestsCard userId={user?.id || 'preview-consumer'} />
+      )}
     </div>
   );
 };

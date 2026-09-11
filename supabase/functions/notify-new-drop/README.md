@@ -2,14 +2,21 @@
 
 When a listing is published (`status = 'active'`), Gonezy emails every other account that has an email so they can claim during the FREE / urgency window.
 
-This is v1 for a ~15-person neighborhood test. It does **not** do Wanted matching, category interests, push, SMS, waitlists, or backup-claim mail. `buyer_interests` stays in the database unused.
+Pickup customers (`profiles.account_type = 'consumer'`) can tap listing categories and choose new-drop mail on Profile:
+
+- **All new drops** (default) — same as today; email every published listing.
+- **Only my categories** — email only when the listing category matches a tap. Requires at least one category.
+
+Consumers with no prefs row, or matching with zero taps, still get every new drop so a new account is never silent. Business / hauler accounts have no interests UI; they still get mail unless they are the seller. The seller of the listing is never emailed.
+
+This does **not** add a public Wanted tab, push, SMS, waitlists, or backup-claim mail. `buyer_interests` stays unused (`search_text` / `radius_miles` do not fit tap + private note).
 
 ## How it fires
 
 1. **Primary:** a Postgres trigger (`private.notify_new_listing_drop`) POSTs to this Edge Function via `pg_net` on listing insert, or when status becomes `active`.
 2. **Backup:** `listingService.createListing` invokes the same function after a successful publish (photos + price windows). The function no-ops if mail already went out.
 
-The function re-reads the listing with the service role, **excludes the seller**, and never puts the exact pickup address in the email. Title, rough distance or “Nearby”, current price / FREE hint, and a deep link only.
+The function re-reads the listing with the service role, **excludes the seller**, honors each consumer’s explicit all-vs-matching choice, and never puts the exact pickup address in the email. Title, rough distance or “Nearby”, current price / FREE hint, and a deep link only.
 
 Deep links: `https://gonezy.com/listing/<id>` (override with `GONEZY_APP_URL`; fallback origin is `https://gonezy.vercel.app`).
 
@@ -61,7 +68,8 @@ From address is hard-coded: **Gonezy \<noreply@gonezy.com\>**.
    - No street address
    - Orange **Claim this drop** button → `/listing/<id>`
 5. User A must **not** receive mail about their own listing.
-6. Publishing the same listing again is impossible; invoking the function twice with the same id returns `{ skipped: true, reason: "already notified" }`.
+6. Consumer who chose **Only my categories** and tapped Furniture gets a Furniture drop, not a Scrap-only drop. Consumer on **All new drops** (or no taps) still gets both. Business accounts still get mail unless they are the seller.
+7. Publishing the same listing again is impossible; invoking the function twice with the same id returns `{ skipped: true, reason: "already notified" }`.
 
 If mail does not arrive:
 

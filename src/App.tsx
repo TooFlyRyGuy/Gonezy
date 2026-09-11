@@ -9,6 +9,7 @@ import { ClaimModal } from './components/marketplace/ClaimModal';
 import { CreateListingForm } from './components/seller/CreateListingForm';
 import { ActivityView } from './components/activity/ActivityView';
 import { ProfileView } from './components/profile/ProfileView';
+import { SignupInterestPrompt } from './components/profile/SignupInterestPrompt';
 import { AuthModal } from './components/auth/AuthModal';
 import { isResetPasswordLocation, ResetPasswordView } from './components/auth/ResetPasswordView';
 import { listingService } from './services/listingService';
@@ -61,6 +62,7 @@ function MarketplaceApp() {
   const [selectedListing, setSelectedListing] = useState<ListingWithDetails | null>(null);
   const [claimListingTarget, setClaimListingTarget] = useState<ListingWithDetails | null>(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [showSignupInterests, setShowSignupInterests] = useState(false);
 
   const loadData = async () => {
     setIsLoadingListings(true);
@@ -369,7 +371,7 @@ function MarketplaceApp() {
           ))}
 
         {currentTab === 'profile' &&
-          (user ? (
+          (user || isPreviewMode() ? (
             <ProfileView />
           ) : (
             <SignInGate
@@ -403,11 +405,18 @@ function MarketplaceApp() {
       <AuthModal
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
-        onSignedUp={() => {
+        onSignedUp={({ accountType }) => {
           setIsAuthModalOpen(false);
           setCurrentTab('profile');
+          if (accountType === 'consumer') {
+            setShowSignupInterests(true);
+          }
         }}
       />
+
+      {showSignupInterests && user && profile?.account_type !== 'business' && (
+        <SignupInterestPrompt userId={user.id} onClose={() => setShowSignupInterests(false)} />
+      )}
     </div>
   );
 }

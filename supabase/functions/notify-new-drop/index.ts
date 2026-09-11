@@ -11,6 +11,7 @@ import {
   listingDeepLink,
   type DropEmailListing,
 } from './email.ts';
+import { filterDropRecipients, type DropRecipient } from './recipients.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -25,8 +26,9 @@ interface AuthUserLike {
   deleted_at?: string | null;
 }
 
-interface ProfileCoords {
+interface ProfileRow {
   id: string;
+  account_type: string | null;
   home_latitude: number | null;
   home_longitude: number | null;
 }
@@ -119,7 +121,7 @@ Deno.serve(async (req) => {
   const { data: listing, error: listingError } = await admin
     .from('listings')
     .select(
-      'id, seller_id, title, status, current_price, is_free, approximate_public_latitude, approximate_public_longitude, drop_email_sent_at'
+      'id, seller_id, title, status, category_id, current_price, is_free, approximate_public_latitude, approximate_public_longitude, drop_email_sent_at'
     )
     .eq('id', listingId)
     .maybeSingle();
@@ -161,26 +163,58 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const [authUsers, profilesRes] = await Promise.all([
+    const [authUsers, profilesRes, prefsRes, tapsRes] = await Promise.all([
       listAuthUsers(admin),
-      admin.from('profiles').select('id, home_latitude, home_longitude'),
+      admin.from('profiles').select('id, account_type, home_latitude, home_longitude'),
+      admin.from('profile_pickup_prefs').select('user_id, drop_email_mode'),
+      admin.from('profile_interest_categories').select('user_id, category_id'),
     ]);
 
     if (profilesRes.error) {
       throw profilesRes.error;
     }
+    if (prefsRes.error) {
+      throw prefsRes.error;
+    }
+    if (tapsRes.error) {
+      throw tapsRes.error;
+    }
 
-    const coordsById = new Map<string, ProfileCoords>(
-      ((profilesRes.data || []) as ProfileCoords[]).map((p) => [p.id, p])
+    const profilesById = new Map<string, ProfileRow>(
+      ((profilesRes.data || []) as ProfileRow[]).map((p) => [p.id, p])
     );
+    const modeById = new Map<string, string>(
+      ((prefsRes.data || []) as { user_id: string; drop_email_mode: string }[]).map((row) => [
+        row.user_id,
+        row.drop_email_mode,
+      ])
+    );
+    const tapsById = new Map<string, string[]>();
+    for (const row of (tapsRes.data || []) as { user_id: string; category_id: string }[]) {
+      const list = tapsById.get(row.user_id) || [];
+      list.push(row.category_id);
+      tapsById.set(row.user_id, list);
+    }
 
     const listingLat = listing.approximate_public_latitude;
     const listingLng = listing.approximate_public_longitude;
     const listingUrl = listingDeepLink(listing.id, appUrl()) || listingDeepLink(listing.id, FALLBACK_APP_URL);
-    const recipients = authUsers.filter((user) => isSendableUser(user, listing.seller_id));
+    const sendable = authUsers.filter((user) => isSendableUser(user, listing.seller_id));
+    const recipientRecords: Array<DropRecipient & AuthUserLike & { email: string }> = sendable.map((user) => ({
+      ...user,
+      email: user.email as string,
+      accountType: profilesById.get(user.id)?.account_type || null,
+      dropEmailMode: modeById.get(user.id) || 'all',
+      categoryIds: tapsById.get(user.id) || [],
+    }));
+    const recipients = filterDropRecipients({
+      recipients: recipientRecords,
+      sellerId: listing.seller_id,
+      listingCategoryId: listing.category_id,
+    });
 
     const emails = recipients.map((user) => {
-      const home = coordsById.get(user.id);
+      const home = profilesById.get(user.id);
       let miles: number | null = null;
       if (
         home?.home_latitude != null &&

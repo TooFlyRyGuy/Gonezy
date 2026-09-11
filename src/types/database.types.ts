@@ -236,6 +236,38 @@ export interface Database {
         Update: Partial<Database['public']['Tables']['buyer_interests']['Insert']>;
         Relationships: [];
       };
+      profile_pickup_prefs: {
+        Row: {
+          user_id: string;
+          looking_for: string;
+          drop_email_mode: 'all' | 'matching';
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          user_id: string;
+          looking_for?: string;
+          drop_email_mode?: 'all' | 'matching';
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database['public']['Tables']['profile_pickup_prefs']['Insert']>;
+        Relationships: [];
+      };
+      profile_interest_categories: {
+        Row: {
+          user_id: string;
+          category_id: string;
+          created_at: string;
+        };
+        Insert: {
+          user_id: string;
+          category_id: string;
+          created_at?: string;
+        };
+        Update: Partial<Database['public']['Tables']['profile_interest_categories']['Insert']>;
+        Relationships: [];
+      };
       claims: {
         Row: {
           id: string;
