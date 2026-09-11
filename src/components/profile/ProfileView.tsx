@@ -3,6 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import { AccountType, BusinessType } from '../../types/database.types';
 import { Building2, CheckCircle2, LogOut, User } from 'lucide-react';
 import { PickupInterestsCard } from './PickupInterestsCard';
+import { isPreviewMode } from '../../lib/supabase';
 
 export const ProfileView: React.FC = () => {
   const { user, profile, updateProfile, signOut } = useAuth();
@@ -168,7 +169,9 @@ export const ProfileView: React.FC = () => {
         </div>
       </form>
 
-      {accountType === 'consumer' && user && <PickupInterestsCard userId={user.id} />}
+      {accountType === 'consumer' && (user || isPreviewMode()) && (
+        <PickupInterestsCard userId={user?.id || 'preview-consumer'} />
+      )}
     </div>
   );
 };

@@ -371,7 +371,7 @@ function MarketplaceApp() {
           ))}
 
         {currentTab === 'profile' &&
-          (user ? (
+          (user || isPreviewMode() ? (
             <ProfileView />
           ) : (
             <SignInGate

@@ -146,7 +146,8 @@ assert.doesNotMatch(header, /Wanted/i);
 assert.match(tabs, /export type NavigationTab = 'explore' \| 'sell' \| 'activity' \| 'profile'/);
 
 const profile = readFileSync(join(root, 'src/components/profile/ProfileView.tsx'), 'utf8');
-assert.match(profile, /accountType === 'consumer' && user && <PickupInterestsCard/);
+assert.match(profile, /accountType === 'consumer' && \(user \|\| isPreviewMode\(\)\)/);
+assert.match(profile, /PickupInterestsCard/);
 assert.doesNotMatch(profile, /Wanted/);
 
 const auth = readFileSync(join(root, 'src/components/auth/AuthModal.tsx'), 'utf8');
